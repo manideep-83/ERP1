@@ -1,0 +1,106 @@
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+const ReportGeneration = () => {
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Overview</Text>
+      <Row label="Product Code" value="" />
+      <Row label="Product Name" value="" />
+      <Row label="Batch" value="" />
+      <Row label="CS/PCS Expiry Date" value="" />
+      <Row label="UOM" value="" />
+      <Row label="Invoice Qty" value="" />
+      <Row label="Receive Qty" value="" />
+      <Row label="Offer Qty" value="" />
+      <Row label="MRP" value="" />
+      <Row label="Purchase Rate" value="" />
+      <Row label="Gross" value="" />
+      <Row label="Tax Amount" value="" />
+      <Row label="Net Amount" value="" />
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={[styles.button, styles.editButton]}>
+          <Ionicons name="create-outline" size={16} color="#fff" />
+          <Text style={styles.buttonText}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.deleteButton]}>
+          <Ionicons name="trash-outline" size={16} color="#fff" />
+          <Text style={styles.buttonText}>Delete</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+};
+
+/* Row Component */
+const Row = ({ label, value }) => (
+  <View style={styles.row}>
+    <Text style={styles.label}>{label}</Text>
+    <Text style={styles.colon}>:</Text>
+    <Text style={styles.value}>{value}</Text>
+  </View>
+);
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    backgroundColor: '#fff',
+    flexGrow: 1,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 16,
+    color: '#1a3d7c',
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 14,
+    color: '#333',
+    flex: 3, // left column
+  },
+  colon: {
+    fontSize: 14,
+    color: '#333',
+    flex: 0.3, // middle column (centered colon)
+    textAlign: 'center',
+  },
+  value: {
+    fontSize: 14,
+    color: '#333',
+    flex: 4, // right column
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+    justifyContent: 'center',
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    marginHorizontal: 8,
+  },
+  editButton: {
+    backgroundColor: '#1a3d7c',
+  },
+  deleteButton: {
+    backgroundColor: '#1a3d7c',
+  },
+  buttonText: {
+    color: '#fff',
+    marginLeft: 6,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+});
+
+export default ReportGeneration;

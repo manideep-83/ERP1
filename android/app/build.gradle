@@ -79,6 +79,7 @@ android {
 
     namespace "com.erp"
     defaultConfig {
+        manifestPlaceholders = [usesCleartextTraffic:"true"]
         applicationId "com.erp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
