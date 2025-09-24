@@ -21,35 +21,18 @@ import Router from './src/Navigation/Routes';
 import Routes from './src/Navigation/Routes';
 import LoginScreen from './src/components/Login';
 import { Text } from 'react-native-paper';
+import ProductOverview from './src/components/ProductPage/ProductOverview'
+import Overview2 from './src/components/ProductPage/Overview2'
+import PriceDiscount from './src/components/ProductPage/PriceDiscount'
+import Pda from './src/components/ConfigurationPages/Pda'
 const App = () => {
-  const renderScreen = () => {
-    switch (currentScreen) {
-      case 'Login':
-        return <Login navigateTo={navigateTo} />;
-      case 'ForgotPassword':
-        return <ForgotPassword navigateTo={navigateTo} />;
-      default:
-        return <AppHeader />
-    }
-  };
-
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#4a69bd" />
-      <AppHeader/>
-      <Invoice />
-    </View>
-
-
-
+  <View style={{display:'flex', flexDirection:'column'}}>
+    {/* <Overview2/> */}
+    <Pda />
+  </View>  
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 export default App;
 
