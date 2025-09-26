@@ -25,11 +25,17 @@ import ProductOverview from './src/components/ProductPage/ProductOverview'
 import Overview2 from './src/components/ProductPage/Overview2'
 import PriceDiscount from './src/components/ProductPage/PriceDiscount'
 import Pda from './src/components/ConfigurationPages/Pda'
+import DistributorConfig from './src/components/ConfigurationPages/DistributorConfig'
+import DayEnd from './src/components/ConfigurationPages/DayEnd'
+import Einvoice from './src/components/ConfigurationPages/Einvoice'
+import HolidayCalander from './src/components/ConfigurationPages/HolidayCalander'
+import CreateScreenName from './src/components/ConfigurationPages/CreateScreenName'
+import CreateStockiest from './src/components/DistributionPages/CreateStockiest'
 const App = () => {
   return (
   <View style={{display:'flex', flexDirection:'column'}}>
     {/* <Overview2/> */}
-    <Pda />
+    <CreateStockiest />
   </View>  
   );
 };

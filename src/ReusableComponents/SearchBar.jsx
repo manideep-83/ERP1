@@ -20,6 +20,9 @@ const SearchBar = ({ onSearch, onDateSelect, onViewAll }) => {
   };
 
   return (
+    <View>
+
+    <Text>Quick Search</Text>
     <View style={styles.container}>
       {/* Search Input */}
       <TextInput
@@ -32,22 +35,22 @@ const SearchBar = ({ onSearch, onDateSelect, onViewAll }) => {
             onSearch && onSearch(text);
           }
         }}
-      />
+        />
 
       {/* Date Picker Button */}
       <TouchableOpacity style={styles.dateButton} onPress={() => setShowPicker(true)}>
         <Text style={styles.dateText}>
-          {date ? date.toLocaleDateString() : "Select Effective Date"}
+          {date ? date.toLocaleDateString() : "Select  Date"}
         </Text>
       </TouchableOpacity>
 
       {/* Calendar Picker */}
       {showPicker && (
         <DateTimePicker
-          value={date || new Date()}
-          mode="date"
-          display="default"
-          onChange={handleDateChange}
+        value={date || new Date()}
+        mode="date"
+        display="default"
+        onChange={handleDateChange}
         />
       )}
 
@@ -56,6 +59,7 @@ const SearchBar = ({ onSearch, onDateSelect, onViewAll }) => {
         <Text style={styles.viewAllText}>View All</Text>
       </TouchableOpacity>
     </View>
+      </View>
   );
 };
 
