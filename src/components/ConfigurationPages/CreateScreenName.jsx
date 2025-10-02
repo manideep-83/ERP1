@@ -1,9 +1,30 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet,TextInput } from "react-native";
 import { Picker } from '@react-native-picker/picker';
+import AppTable from "../../ReusableComponents/AppTable";
 const CreateScreenName = () => {
   const [salesman, setSalesman] = useState("");
   const [route, setRoute] = useState("");
+  const columns = [
+  { header: 'Screen Name', key: 'name', flex: 1 },
+  { header: 'Create', key: 'name', flex: 2 },
+
+  { 
+    header: 'Action', 
+    key: 'action', 
+    flex: 1,
+    renderCell: (item) => (
+      <TouchableOpacity onPress={() => alert(`Clicked ${item.name}`)}>
+        <Text>Show</Text>
+      </TouchableOpacity>
+      
+    )
+  }
+];
+
+const data = [
+  { id: 1, name: 'Product A' ,date:'12-08-2023'},
+];
 
   return (
     <View style={styles.container}>
@@ -17,7 +38,12 @@ const CreateScreenName = () => {
              <LabeledUnderlineInput label="Module Name" placeholder="Select Module" />
         </View>
         <Text style={styles.label}>Screen Name</Text>
-        <Text style={styles.label}>Table</Text>
+        {/* <Text style={styles.label}>Table</Text> */}
+        <AppTable 
+        columns={columns} 
+        data={data} 
+        message={`Total Records: ${data.length}`} 
+      />
       </View>
 
       {/* Buttons */}

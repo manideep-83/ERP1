@@ -2,16 +2,31 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AppHeader from './AppHeader'; // Assuming the AppHeader component is in a separate file
+import { useNavigation } from '@react-navigation/native';
 
 // Data for each of the master buttons
 const reportData = [
-    { id: '1', name: 'Route', icon: require('../../Assets/Home/Vector-1.png') },
-    { id: '2', name: 'Salesman',icon: require('../../Assets/Configuration/Vector.png') },
-    { id: '3', name: 'Salesman Route Mapping', icon: require('../../Assets/Home/Vector.png')},
-    { id: '4', name: 'Salesman KYC', icon: require('../../Assets/Cusomer/Vector.png')},
-    { id: '5', name: 'Distributor Branch', icon: require('../../Assets/product/Vector-1.png')},
+    { id: '1', name: 'Purchase Reports', icon: require('../../Assets/Report.png') },
+    { id: '2', name: 'Sales Reports',icon: require('../../Assets/Report.png') },
+    { id: '3', name: 'Live Reports', icon: require('../../Assets/Report.png')},
+    { id: '4', name: 'Schemes & Claims', icon: require('../../Assets/Report.png')},
+    { id: '5', name: 'Collection Reports', icon: require('../../Assets/Report.png')},
+    { id: '6', name: 'Stock Reports', icon: require('../../Assets/Report.png')},
+    { id: '7', name: 'Bill Print', icon: require('../../Assets/Report.png')},
+    { id: '8', name: 'Informative Reports', icon: require('../../Assets/Report.png')},
+    { id: '9', name: 'Finance Reports', icon: require('../../Assets/Report.png')},
+    { id: '10', name: 'Claims Reports', icon: require('../../Assets/Report.png')},
+    { id: '11', name: 'GST Reports', icon: require('../../Assets/Report.png')},
+    { id: '12', name: 'GSRT Reports', icon: require('../../Assets/Report.png')},
+    { id: '13', name: 'General Reports', icon: require('../../Assets/Report.png')},
+    { id: '14', name: 'Master Reports', icon: require('../../Assets/Report.png')},
 ];
 const ReportScreen = () => {
+  const navigation=useNavigation()
+     const change=(item)=>{
+        // console.error("pressed",id);
+         return navigation.navigate(item.name);
+      }
   return (
     <ScrollView style={styles.container}>
       <View style={styles.contentContainer}>
@@ -19,7 +34,7 @@ const ReportScreen = () => {
         <Text style={styles.subtitle}>Welcome back! Here's your business overview</Text>
         <View style={styles.gridContainer}>
           {reportData.map((item,index ) => (
-            <TouchableOpacity key={item.id} style={[styles.itemContainer,{ backgroundColor: colors[index % colors.length] }]}>
+            <TouchableOpacity key={item.id} onPress={()=>{change(item)}} style={[styles.itemContainer,{ backgroundColor: colors[index % colors.length] }]}>
               {/* <Ionicons name={item.icon} size={35} color="#1e3a8a" /> */}
                <Image source={item.icon} style={styles.icon} resizeMode="contain" />
               <Text style={styles.itemName}>{item.name}</Text>

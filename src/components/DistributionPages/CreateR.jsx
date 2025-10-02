@@ -9,8 +9,18 @@ import {
 } from "react-native";
 import { RadioButton } from "react-native-paper";
 import LabeledUnderlineInput from '../../ReusableComponents/LabeledUnderlineInput'
+import AppTable from "../../ReusableComponents/AppTable";
 
 const CreateR = () => {
+  const columns = [
+  { header: 'Route Code', key: 'id', flex: 1 },
+  { header: 'Route Name', key: 'name', flex: 2 },
+
+];
+
+const data = [
+  { id: 1, name: 'Product A' },
+];
   const [status, setStatus] = useState("Active");
   return (
     <ScrollView style={styles.container}>
@@ -34,6 +44,11 @@ const CreateR = () => {
             </TouchableOpacity>   
             </View>
             <Text>Table</Text>
+            <AppTable 
+        columns={columns} 
+        data={data} 
+        message={`Total Records: ${data.length}`} 
+      />
          <View style={styles.Brow}>
                  <TouchableOpacity style={styles.Buttons}>
                    <Text style={styles.buttonText}>Save</Text>

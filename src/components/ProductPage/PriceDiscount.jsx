@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   picker: {
-    height: 45,
+    height: 53,
     width: '100%',
   },
   button: {

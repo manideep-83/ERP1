@@ -8,8 +8,36 @@ import {
   ScrollView,
 } from "react-native";
 import { RadioButton } from "react-native-paper";
-
+import AppTable from '../../ReusableComponents/AppTable'
+import { useNavigation } from "@react-navigation/native";
 const EInvoiceReport = () => {
+  const navigation=useNavigation()
+   const change=(name)=>{
+      // console.error("pressed",id);
+       return navigation.navigate(name);
+    }
+   const columns = [
+  { header: 'Invoice No', key: 'id', flex: 1 },
+  { header: 'IRN Status', key: 'name', flex: 2 },
+  { header: 'Invoice Tpe Tax', key: 'date', flex: 2 },
+  { header: 'Amount', key: 'date', flex: 2 },
+
+  { 
+    header: 'Action', 
+    key: 'action', 
+    flex: 1,
+    renderCell: (item) => (
+      <TouchableOpacity onPress={() =>{change("EInvoiceOverview")}}>
+        <Text>Show</Text>
+      </TouchableOpacity>
+      
+    )
+  }
+];
+
+const data = [
+  { id: 1, name: 'Product A' ,date:'12-08-2023'},
+];
   const [transactionType, setTransactionType] = useState("Sales");
 
   return (
@@ -17,7 +45,7 @@ const EInvoiceReport = () => {
       {/* Header */}
       <View style={styles.headerRow}>
         <Text style={styles.header}>E-Invoice Report</Text>
-        <TouchableOpacity style={styles.createBtn}>
+        <TouchableOpacity style={styles.createBtn} onPress={() =>{change("CreateEI")}}>
           <Text style={styles.createBtnText}>+ Create New</Text>
         </TouchableOpacity>
       </View>
@@ -104,7 +132,11 @@ const EInvoiceReport = () => {
       </View>
 
       {/* Table */}
-      
+       <AppTable 
+        columns={columns} 
+        data={data} 
+        message={`Total Records: ${data.length}`}
+      />
 
       {/* Generate Button */}
       <TouchableOpacity style={styles.generateBtn}>
@@ -130,8 +162,8 @@ const styles = StyleSheet.create({
 
   // Header
   headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  header: { fontSize: 20, fontWeight: "700", color: "#1E64CC" },
-  createBtn: { backgroundColor: "#1E64CC", paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6 },
+  header: { fontSize: 20, fontWeight: "700", color: "#1E3A8A" },
+  createBtn: { backgroundColor: "#1E3A8A", paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6 },
   createBtnText: { color: "#fff", fontWeight: "600" },
 
   // Tabs

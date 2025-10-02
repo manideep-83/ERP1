@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AppHeader from './AppHeader'; // Assuming the AppHeader component is in a separate file
+import { useNavigation } from '@react-navigation/native';
 
 // Data for each of the master buttons
 const mastersData = [
@@ -23,6 +24,11 @@ const mastersData = [
 ];
 
 const Distribution = () => {
+  const navigation=useNavigation();
+   const change=(item)=>{
+      // console.error("pressed",id);
+       return navigation.navigate(item.name);
+    }
   return (
     <ScrollView style={styles.container}>
       <View style={styles.contentContainer}>
@@ -30,7 +36,7 @@ const Distribution = () => {
         <Text style={styles.subtitle}>Welcome back! Here's your business overview</Text>
         <View style={styles.gridContainer}>
           {mastersData.map((item,index ) => (
-            <TouchableOpacity key={item.id} style={[styles.itemContainer,{ backgroundColor: colors[index % colors.length] }]}>
+            <TouchableOpacity key={item.id} onPress={()=>change(item)} style={[styles.itemContainer,{ backgroundColor: colors[index % colors.length] }]}>
               {/* <Ionicons name={item.icon} size={35} color="#1e3a8a" /> */}
                <Image source={item.icon} style={styles.icon} resizeMode="contain" />
               <Text style={styles.itemName}>{item.name}</Text>

@@ -2,8 +2,17 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import CheckBoxx from "../../ReusableComponents/CheckBox";
 import LabeledUnderlineInput from "../../ReusableComponents/LabeledUnderlineInput";
+import AppTable from "../../ReusableComponents/AppTable";
 
 const CreateSalesRouteMapping = () => {
+  const columns = [
+    { header: 'Route Code', key: 'id', flex: 1 },
+    { header: 'Route Name', key: 'name', flex: 2 },
+  ];
+  
+  const data = [
+    {},
+  ];
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -24,8 +33,12 @@ const CreateSalesRouteMapping = () => {
         </View>
 
         {/* Calls Section */}
-        
-        <Text>Table</Text>
+        <AppTable 
+        columns={columns} 
+        data={data} 
+        message={`Total Records: ${data.length}`} 
+      />
+        {/* <Text>Table</Text> */}
       </View>
 
       {/* Footer buttons */}
@@ -55,7 +68,7 @@ const SectionCard = ({ title1, title2, children }) => (
 const styles = StyleSheet.create({
   container: { backgroundColor: "#fff", padding: 10 },
   headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  header: { fontSize: 20, fontWeight: "700", color: "#1E64CC" },
+  header: { fontSize: 20, fontWeight: "700", color: "#1E3A8A" },
 
   Vrow: { flexDirection: "row", justifyContent: "space-between" },
   filterBox: { borderWidth: 1, borderColor: "#ddd", borderRadius: 8, padding: 10, marginBottom: 15 },
@@ -80,7 +93,7 @@ const styles = StyleSheet.create({
   legendBold: { fontWeight: "bold" },
   daysRow: { flexDirection: "row", flexWrap: "wrap" },
 
-  Brow: { flexDirection: "row", justifyContent: "space-evenly", marginTop: 10 },
+  Brow: { flexDirection: "row", justifyContent: "space-evenly", marginTop: 10 ,marginBottom:10},
   Buttons: {
     flexDirection: "row",
     alignItems: "center",

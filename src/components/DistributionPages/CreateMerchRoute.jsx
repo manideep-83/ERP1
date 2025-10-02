@@ -2,8 +2,18 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import CheckBoxx from "../../ReusableComponents/CheckBox";
 import LabeledUnderlineInput from "../../ReusableComponents/LabeledUnderlineInput";
+import AppTable from "../../ReusableComponents/AppTable";
 
 const CreateMerchRoute = () => {
+  const columns = [
+  { header: 'Route Code', key: 'id', flex: 1 },
+  { header: 'Route Name', key: 'name', flex: 2 },
+  
+];
+
+const data = [
+  { id: 1, name: 'Product A' },
+];
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -26,6 +36,11 @@ const CreateMerchRoute = () => {
         {/* Calls Section */}
         
         <Text>Table</Text>
+        <AppTable 
+        columns={columns} 
+        data={data} 
+        message={`Total Records: ${data.length}`} 
+      />
       </View>
 
       {/* Footer buttons */}

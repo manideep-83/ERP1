@@ -56,8 +56,8 @@ const styles = StyleSheet.create({
 
   // Header
   headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  header: { fontSize: 20, fontWeight: "700", color: "#1E64CC" },
-  createBtn: { backgroundColor: "#1E64CC", paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6 },
+  header: { fontSize: 20, fontWeight: "700", color: "#1E3A8A" },
+  createBtn: { backgroundColor: "#1E3A8A", paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6 },
   createBtnText: { color: "#fff", fontWeight: "600" },
 
 

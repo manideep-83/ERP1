@@ -89,22 +89,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
 },
 saveButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#2563EB",
+    backgroundColor: "#1a3d7c",
+    paddingHorizontal: 12,
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginRight: 10,
+    borderRadius: 6,
 },
-cancelButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#2563EB",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
+
   buttonText: {
       color: "#fff",
       fontWeight: "bold",

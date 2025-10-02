@@ -21,22 +21,25 @@ import Router from './src/Navigation/Routes';
 import Routes from './src/Navigation/Routes';
 import LoginScreen from './src/components/Login';
 import { Text } from 'react-native-paper';
-import ProductOverview from './src/components/ProductPage/ProductOverview'
+import ProductOverview from './src/components/ProductPage/GST'
 import Overview2 from './src/components/ProductPage/Overview2'
 import PriceDiscount from './src/components/ProductPage/PriceDiscount'
 import Pda from './src/components/ConfigurationPages/Pda'
-import DistributorConfig from './src/components/ConfigurationPages/DistributorConfig'
+import BillPrintConfig from './src/components/ConfigurationPages/BillPrintConfig'
 import DayEnd from './src/components/ConfigurationPages/DayEnd'
 import Einvoice from './src/components/ConfigurationPages/Einvoice'
-import HolidayCalander from './src/components/ConfigurationPages/HolidayCalander'
+import CreateHoliday from './src/components/ConfigurationPages/CreateHoliday'
 import CreateScreenName from './src/components/ConfigurationPages/CreateScreenName'
-import CreateStockiest from './src/components/DistributionPages/CreateStockiest'
+import CreateRCS from './src/components/DistributionPages/CreateRCS'
+import EInvoiceReport from './src/components/DistributionPages/EInvoiceReport'
+import P$P from './src/components/ProductPage/P$P';
 const App = () => {
   return (
-  <View style={{display:'flex', flexDirection:'column'}}>
-    {/* <Overview2/> */}
-    <CreateStockiest />
-  </View>  
+  // <View style={{display:'flex', flexDirection:'column'}}>
+  //   {/* <Overview2/> */}
+  //   <DayEnd/>
+  // </View>
+  <Routes/>  
   );
 };
 

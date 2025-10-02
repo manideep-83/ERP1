@@ -1,14 +1,48 @@
 import { View, Text,StyleSheet ,TouchableOpacity} from 'react-native'
 import React from 'react'
+import AppTable from '../../ReusableComponents/AppTable'
 import SearchBar from '../../ReusableComponents/SearchBar'
+import { useNavigation } from '@react-navigation/native'
 const DistributionBranch = () => {
+  const navigation=useNavigation()
+     const change=(name)=>{
+        // console.error("pressed",id);
+         return navigation.navigate(name);
+      }
+  const columns = [
+  { header: 'Dist COde ', key: 'id', flex: 1 },
+  { header: 'Branch Code', key: 'name', flex: 2 },
+  { header: 'Location', key: 'date', flex: 2 },
+  { header: 'Phn No', key: 'date', flex: 2 },
+
+  { 
+    header: 'Action', 
+    key: 'action', 
+    flex: 1,
+    renderCell: (item) => (
+      <TouchableOpacity onPress={() => {change("DistributionBranchOverview")}}>
+        <Text>Show</Text>
+      </TouchableOpacity>
+      
+    )
+  }
+];
+
+const data = [
+  { id: 1, name: 'Product A' ,date:'12-08-2023'},
+];
   return (
     <View>
         <View styles={styles.heading} >
-        <Text style={styles.title}>Holiday Calander</Text>
+        <Text style={styles.title}>Distribution Branch</Text>
         </View>
         <SearchBar />
         {/* Table */}
+        <AppTable 
+        columns={columns} 
+        data={data} 
+        message={`Total Records: ${data.length}`} 
+      />
     </View>
   )
 }

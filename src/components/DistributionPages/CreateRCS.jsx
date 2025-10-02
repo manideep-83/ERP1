@@ -2,8 +2,31 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import CheckBoxx from "../../ReusableComponents/CheckBox";
 import LabeledUnderlineInput from "../../ReusableComponents/LabeledUnderlineInput";
+import AppTable from "../../ReusableComponents/AppTable";
 
 const CreateRCS = () => {
+  const columns = [
+  { header: 'Date of visit', key: 'date', flex: 1 },
+  { header: 'Day of  visit', key: 'date', flex: 2 },
+  { header: 'Route Name', key: 'name', flex: 2 },
+  // { header: 'Amount', key: 'date', flex: 2 },
+
+  { 
+    header: 'Action', 
+    key: 'action', 
+    flex: 1,
+    renderCell: (item) => (
+      <TouchableOpacity onPress={() => alert(`Clicked ${item.name}`)}>
+        <Text>Show</Text>
+      </TouchableOpacity>
+      
+    )
+  }
+];
+
+const data = [
+  { id: 1, name: 'Product A' ,date:'12-08-2023'},
+];
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -37,7 +60,13 @@ const CreateRCS = () => {
         </TouchableOpacity>
         </View>
         <Text>Table</Text>
+        <AppTable 
+        columns={columns} 
+        data={data} 
+        message={`Total Records: ${data.length}`} 
+      />
       </View>
+
 
       {/* Footer buttons */}
       <View style={styles.Brow}>
