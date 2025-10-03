@@ -202,6 +202,15 @@ import CreateMidasSalesReturn from '../components/CustomerPages//MidasSalesRetur
 import MidasSalesReturnCreateOverview from '../components/CustomerPages/MidasSalesReturn/MidasSalesReturnCreateOverview'
 import OrderToBilling from '../components/CustomerPages/Billing/OrderToBilling'
 
+import Godown from '../components/InventoryPages/GoDown/Godown'
+import GodownOverview from '../components/InventoryPages/GoDown/GodownOverview'
+import CreateGodown from '../components/InventoryPages/GoDown/CreateGodown'
+// import StockAdjust from '../components/InventoryPages/StockAdjustment/StockAdjustment'
+import StockAdjustment from '../components/InventoryPages/StockAdjustment/StockAdjustment';
+import StockAdjustmentOverview from '../components/InventoryPages/StockAdjustment/StockAdjustmentOverview'
+import BatchTransfer from '../components/InventoryPages/BatchTransfer/BatchTransfer'
+import BatchTransferOverview from '../components/InventoryPages/BatchTransfer/BatchTransferOverview'
+import CreateBatchTransfer from '../components/InventoryPages/BatchTransfer/CreateBatchTransfer'
 const Routes = () => {
     const Stack= createNativeStackNavigator()
   return (
@@ -459,6 +468,17 @@ const Routes = () => {
 <Stack.Screen name="MidasSalesReturnCreateOverview" component={MidasSalesReturnCreateOverview} />
 
 <Stack.Screen name="OrderToBilling" component={OrderToBilling} />
+
+
+
+  <Stack.Screen name="Godown" component={Godown} />
+  <Stack.Screen name="GodownOverview" component={GodownOverview} />
+  <Stack.Screen name="CreateGoDown" component={CreateGodown} />
+   <Stack.Screen name="Stock Adjust" component={StockAdjustment} />
+    <Stack.Screen name="StockAdjustmentOverview" component={StockAdjustmentOverview} />
+     <Stack.Screen name="Batch Transfer" component={BatchTransfer} />
+      <Stack.Screen name="BatchTransferOverview" component={BatchTransferOverview} />
+       <Stack.Screen name="CreateBatchTransfer" component={CreateBatchTransfer} />
         </Stack.Navigator>
     </NavigationContainer>
   )
