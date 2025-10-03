@@ -11,29 +11,36 @@ import {
   StatusBar,
   Platform,
   KeyboardAvoidingView,
+  Alert,
 } from 'react-native';
-
 
 const LoginScreen = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const navigation=useNavigation()
-  const change=()=>{
+  const navigation = useNavigation();
+
+  const change = () => {
     return navigation.navigate('ForgotPassword');
-  }
-  // const onLogin = () => {
-  //   // replace with real auth / navigation
-  //   console.log('login pressed', { username, password });
-  //   if (navigation && navigation.navigate) navigation.navigate('Home');
-  // };
-  const onLogin=()=>{
-     console.warn("pressed");
-    return navigation.navigate('Home')
-  }
- 
+  };
+
+  // ✅ Dummy credentials
+  const DUMMY_USER = "BP_ADMIN";
+  const DUMMY_PASS = "1234";
+
+  const onLogin = () => {
+    if (username === DUMMY_USER && password === DUMMY_PASS) {
+      // ✅ Successful login
+      Alert.alert("Login Successful", "Welcome back!", [
+        { text: "OK", onPress: () => navigation.navigate("Home") }
+      ]);
+    } else {
+      // ❌ Invalid credentials
+      Alert.alert("Login Failed", "Invalid username or password");
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
-
       <StatusBar barStyle="light-content" backgroundColor="#4a69bd" />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -44,14 +51,14 @@ const LoginScreen = () => {
           Login to your account and start managing products
         </Text>
 
-        
-       <Image 
+        <Image 
           source={require('../../Assets/login/Vector-4.png')} 
           style={{ width: 150, height: 100, resizeMode: 'contain' }} 
         />
         <Text style={styles.logoText}>Bahupada</Text>
+
+        {/* Username */}
         <View style={styles.inputContainer}>
-        
           <TextInput
             value={username}
             onChangeText={setUsername}
@@ -63,8 +70,8 @@ const LoginScreen = () => {
           />
         </View>
 
+        {/* Password */}
         <View style={styles.inputContainer}>
-          
           <TextInput
             value={password}
             onChangeText={setPassword}
@@ -77,14 +84,14 @@ const LoginScreen = () => {
           />
         </View>
 
+        {/* Login Button */}
         <TouchableOpacity style={styles.loginButton} onPress={onLogin} activeOpacity={0.85}>
           <Text style={styles.loginButtonText}>Login</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={change}
-        >
-          <Text style={styles.forgotPasswordText} >Forgot Password?</Text>
+        {/* Forgot Password */}
+        <TouchableOpacity onPress={change}>
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -134,9 +141,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     height: 50,
   },
-  inputIcon: {
-    marginRight: 10,
-  },
   input: {
     flex: 1,
     height: '100%',
@@ -152,9 +156,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center',
     marginBottom: 20,
-  },
-  buttonIcon: {
-    marginRight: 10,
   },
   loginButtonText: {
     color: '#3b59a8',

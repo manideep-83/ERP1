@@ -1,23 +1,27 @@
-
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '../../../ReusableComponents/SearchBar';
 import AppTable from '../../../ReusableComponents/AppTable';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AppButton from '../../../ReusableComponents/AppButton';
 
 const Retailer = () => {
   const navigation = useNavigation();
+
   const handleDateSelect = (date) => {
     console.log('Selected date:', date);
   };
+
   const handleView = (item) => navigation.navigate('RetailerOverview', { item });
+
   const handleDelete = (item) => {
     Alert.alert('Delete', `Are you sure you want to delete ${item.name}?`, [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: () => console.log('Deleted', item) }
     ]);
   };
+
   const columns = [
     { header: 'Distributor Branch', key: 'id', flex: 1 },
     { header: 'Type', key: 'name', flex: 2 },
@@ -28,8 +32,8 @@ const Retailer = () => {
       flex: 2,
       renderCell: (item) => (
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity onPress={() => handleView(item)} style={{ marginRight: 10 }}>
-            <Ionicons name="eye-outline" size={20} color="#007bff" />
+          <TouchableOpacity onPress={() => handleView(item)} style={{ marginRight: 12 }}>
+            <Ionicons name="eye-outline" size={20} color="#2563eb" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleDelete(item)}>
             <Ionicons name="trash-outline" size={20} color="#dc2626" />
@@ -38,22 +42,35 @@ const Retailer = () => {
       )
     }
   ];
+
   const data = [
     { id: 1, name: 'Product A', date: '12-08-2023' },
     { id: 2, name: 'Product B', date: '12-09-2023' },
   ];
+
   return (
-    <View>
-      <Text style={styles.title}>Retailer</Text>
-      <TouchableOpacity style={styles.Button} onPress={() => navigation.navigate('CreateRetailer')}>
-        <Text style={styles.buttonText}>+ Create new</Text>
-      </TouchableOpacity>
+    <View style={styles.container}>
+      {/* Header with Create Button */}
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>Retailer</Text>
+        {/* <AppButton
+          label="Create New"
+          onPress={() => navigation.navigate('CreateRetailer')} 
+          style={styles.createNewButton}
+          textStyle={styles.createNewButtonText}
+        /> */}
+      </View>
+
+      {/* Search Bar */}
       <SearchBar
-        placeholder="Search Product"
+        placeholder="Search Retailer"
         showDatePicker={true}
         onDateChange={handleDateSelect}
       />
-      <Text style={styles.title}>Search Results</Text>
+
+      <Text style={styles.subTitle}>Search Results</Text>
+
+      {/* Data Table */}
       <AppTable
         columns={columns}
         data={data}
@@ -64,20 +81,46 @@ const Retailer = () => {
 };
 
 const styles = StyleSheet.create({
-  title: { fontSize: 18, fontWeight: '700', marginBottom: 16, color: '#1a3d7c' },
-  Button: {
+  container: {
+    flex: 1, 
+    padding: 16, 
+    backgroundColor: '#f9fafb'
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  title: { 
+    fontSize: 20, 
+    fontWeight: '700', 
+    color: '#1a3d7c' 
+  },
+  subTitle: { 
+    fontSize: 16, 
+    fontWeight: '600', 
+    marginVertical: 12, 
+    color: '#374151' 
+  },
+  createNewButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2563EB',
+    backgroundColor: '#1f3a8a',
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 18,
     borderRadius: 8,
-    marginRight: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
-  buttonText: {
+  createNewButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
-  }
+    fontSize: 15,
+    fontWeight: '600',
+  },
 });
 
 export default Retailer;

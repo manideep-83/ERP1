@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+// import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Overview = ({ title, rows = [], onEdit, onDelete }) => {
   return (
@@ -18,7 +18,7 @@ const Overview = ({ title, rows = [], onEdit, onDelete }) => {
           style={[styles.button, styles.editButton]}
           onPress={onEdit}
         >
-          <Ionicons name="create-outline" size={16} color="#fff" />
+          {/* <Ionicons name="create-outline" size={16} color="#fff" /> */}
           <Text style={styles.buttonText}>Edit</Text>
         </TouchableOpacity>
 
@@ -26,7 +26,7 @@ const Overview = ({ title, rows = [], onEdit, onDelete }) => {
           style={[styles.button, styles.deleteButton]}
           onPress={onDelete}
         >
-          <Ionicons name="trash-outline" size={16} color="#fff" />
+          {/* <Ionicons name="trash-outline" size={16} color="#fff" /> */}
           <Text style={styles.buttonText}>Delete</Text>
         </TouchableOpacity>
       </View>

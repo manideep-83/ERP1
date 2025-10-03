@@ -1,273 +1,152 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Platform } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, SafeAreaView, ScrollView, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
-import AppTable from '../../../ReusableComponents/AppTable'; // Assuming this path is correct
+import AppTable from '../../../ReusableComponents/AppTable';
+import AppButton from '../../../ReusableComponents/AppButton';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import SearchBar from '../../../ReusableComponents/SearchBar';
 
 const MidasSalesReturn = () => {
-    // --- State for Search/Filter Fields ---
-    const [fromDate, setFromDate] = useState('08/09/2025');
-    const [toDate, setToDate] = useState('08/09/2025');
-    const [retailer, setRetailer] = useState('Select');
-    const [status, setStatus] = useState('Pending to be pulled for SR');
-    
-    // Mock Data for Pickers
-    const retailerOptions = ["Select", "Retailer A", "Retailer B"];
-    
-    // --- Table Data (Search Results) ---
-    const tableData = [
-        // Mock data
-        // { id: 1, distributor: 'D-001', invoiceDate: '01/08/2025', retailerCode: 'R-001' },
-    ];
+  const navigation = useNavigation();
 
-    // Table Column Configuration
-    const columns = [
-        { header: 'Distributor', key: 'distributor', flex: 3 },
-        { header: 'Invoice Date', key: 'invoiceDate', flex: 2 },
-        { header: 'Retailer code', key: 'retailerCode', flex: 2 },
-        {
-            header: 'Action',
-            key: 'action',
-            flex: 1.5,
-            renderCell: (item) => (
-                <View style={styles.actionCell}>
-                    <TouchableOpacity onPress={() => console.log(`View invoice for ${item.distributor}`)} style={{ marginRight: 10 }}>
-                        <Ionicons name="eye-outline" size={20} color="#007bff" />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => console.log(`Delete invoice for ${item.distributor}`)}>
-                        <Ionicons name="trash-outline" size={20} color="#dc2626" />
-                    </TouchableOpacity>
-                </View>
-            )
-        }
-    ];
+  const [fromDate, setFromDate] = useState('08/09/2025');
+  const [toDate, setToDate] = useState('08/09/2025');
+  const [retailer, setRetailer] = useState('Select');
+  const [status, setStatus] = useState('Pending to be pulled for SR');
 
-    const handleCreateNew = () => console.log('Navigating to Create New SRN screen...');
-    
-    const handleLoad = () => {
-        console.log('Loading Sales Returns based on filters...');
-        // Placeholder: Logic to fetch data and update tableData state
-    };
-    
-    // Helper function to render a display value
-    const renderDisplay = (label, value) => (
-        <View style={styles.inputGroup}>
-            <Text style={styles.label}>{label}</Text>
-            <Text style={styles.displayValue}>{value}</Text>
+  const retailerOptions = ["Select", "Retailer A", "Retailer B"];
+
+  const handleDateSelect = (date) => {
+    console.log('Selected date:', date);
+  };
+
+  const handleCreateNew = () => {
+    console.log('Navigate to Create New SRN');
+    navigation.navigate('CreateMidasSalesReturn'); // Replace with actual screen name
+  };
+
+  const handleView = (item) => {
+        navigation.navigate('MidasSalesReturnOverview'); // Replace with actual screen name
+
+  };
+
+  const handleDelete = (item) => {
+    Alert.alert('Delete', `Are you sure you want to delete ${item.distributor}?`, [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: () => console.log('Deleted', item) }
+    ]);
+  };
+
+  const columns = [
+    { header: 'Distributor', key: 'distributor', flex: 3 },
+    { header: 'Invoice Date', key: 'invoiceDate', flex: 2 },
+    { header: 'Retailer code', key: 'retailerCode', flex: 2 },
+    {
+      header: 'Action',
+      key: 'action',
+      flex: 2,
+      renderCell: (item) => (
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity onPress={() => handleView(item)} style={{ marginRight: 10 }}>
+            <Ionicons name="eye-outline" size={20} color="#007bff" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleDelete(item)}>
+            <Ionicons name="trash-outline" size={20} color="#dc2626" />
+          </TouchableOpacity>
         </View>
-    );
+      )
+    }
+  ];
 
-    const renderPicker = (selectedValue, onValueChange, options, label) => (
-        <View style={styles.inputGroup}>
-            <Text style={styles.label}>{label}</Text>
+  const data = [
+    { distributor: 'D-001', invoiceDate: '08-09-2025', retailerCode: 'R-001' },
+    { distributor: 'D-002', invoiceDate: '08-09-2025', retailerCode: 'R-002' },
+  ];
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Header */}
+        <View style={styles.headerRow}>
+          <Text style={styles.title}>Midas Sales Return</Text>
+          <AppButton
+            label="Create New"
+            onPress={handleCreateNew}
+            style={styles.createNewButton}
+            textStyle={styles.createNewButtonText}
+          />
+        </View>
+
+        {/* Search / Filter Section */}
+        <SearchBar
+          placeholder="Search Distributor"
+          showDatePicker={true}
+          onDateChange={handleDateSelect}
+        />
+        <View style={styles.pickerRow}>
+          <View style={styles.pickerGroup}>
+            <Text style={styles.label}>Retailer</Text>
             <View style={styles.pickerContainer}>
-                <Picker
-                    selectedValue={selectedValue}
-                    onValueChange={onValueChange}
-                    style={styles.picker}
-                >
-                    {options.map((option, index) => (
-                        <Picker.Item key={index} label={option} value={option} />
-                    ))}
-                </Picker>
+              <Picker
+                selectedValue={retailer}
+                onValueChange={setRetailer}
+                style={styles.picker}
+              >
+                {retailerOptions.map((option, index) => (
+                  <Picker.Item key={index} label={option} value={option} />
+                ))}
+              </Picker>
             </View>
+          </View>
+          <View style={styles.pickerGroup}>
+            <Text style={styles.label}>Status</Text>
+            <Text style={styles.displayValue}>{status}</Text>
+          </View>
         </View>
-    );
 
-    return (
-        <ScrollView style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerText}>Midas Sales return</Text>
-                <TouchableOpacity style={styles.createNewButton} onPress={handleCreateNew}>
-                    <Ionicons name="add-circle-outline" size={24} color="#fff" style={styles.buttonIcon} />
-                    <Text style={styles.createNewButtonText}>Create New</Text>
-                </TouchableOpacity>
-            </View>
-
-            {/* --- Search Filter Container --- */}
-            <View style={styles.formContainer}>
-                
-                {/* Row 1: From Date | To Date | Retailer */}
-                <View style={styles.row}>
-                    <View style={[styles.inputGroup, styles.inputGroupMarginRight]}>
-                        {renderDisplay('From Date', fromDate)}
-                    </View>
-                    <View style={[styles.inputGroup, styles.inputGroupMarginRight]}>
-                        {renderDisplay('To Date', toDate)}
-                    </View>
-                    <View style={styles.inputGroup}>
-                        {renderPicker(retailer, setRetailer, retailerOptions, 'Retailer')}
-                    </View>
-                </View>
-
-                {/* Row 2: Status | Load Button */}
-                <View style={styles.statusRow}>
-                    <View style={[styles.inputGroup, { flex: 1.5, marginRight: 15 }]}>
-                        {renderDisplay('Status*', status)}
-                    </View>
-                    <TouchableOpacity style={styles.loadButton} onPress={handleLoad}>
-                        <Text style={styles.loadButtonText}>Load</Text>
-                    </TouchableOpacity>
-                    <View style={{ flex: 4 }} /> {/* Spacer */}
-                </View>
-                
-            </View>
-
-            {/* --- AppTable Component --- */}
-            <View style={styles.tableContainer}>
-                <AppTable
-                    columns={columns}
-                    data={tableData}
-                    message={tableData.length === 0 ? 'No matching record(s) found' : `Total Entries: ${tableData.length}`}
-                />
-            </View>
-
-            {/* --- Pagination Footer --- */}
-           
-
-        </ScrollView>
-    );
+        {/* Table */}
+        <View style={styles.resultsContainer}>
+          <Text style={styles.resultsTitle}>Search Results</Text>
+          <AppTable
+            columns={columns}
+            data={data}
+            message={`Total Records: ${data.length}`}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f5f5f5',
-        padding: 10,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: 15,
-        marginBottom: 20,
-    },
-    headerText: {
-        fontSize: 30,
-        fontWeight: 'bold',
-        color: '#1f3a8a',
-        marginLeft: 10,
-    },
-    createNewButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#1f3a8a',
-        paddingVertical: 10,
-        paddingHorizontal: 15,
-        borderRadius: 5,
-        marginRight: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-        elevation: 3,
-    },
-    buttonIcon: {
-        marginRight: 5,
-    },
-    createNewButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    // --- Search Filter Form Container ---
-    formContainer: {
-        backgroundColor: '#fff',
-        padding: 20,
-        borderRadius: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 3,
-        marginBottom: 20,
-    },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 15,
-    },
-    statusRow: {
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        marginBottom: 15,
-    },
-    inputGroup: {
-        flex: 1,
-    },
-    inputGroupMarginRight: {
-        marginRight: 10,
-    },
-    label: {
-        fontSize: 12,
-        color: '#666',
-        marginBottom: 2,
-    },
-    displayValue: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-        paddingVertical: Platform.OS === 'ios' ? 8 : 4,
-    },
-    pickerContainer: {
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-        justifyContent: 'center',
-        height: 40,
-        paddingHorizontal: Platform.OS === 'ios' ? 0 : -8,
-    },
- 
-    loadButton: {
-        backgroundColor: '#1f3a8a',
-        paddingVertical: 8,
-        paddingHorizontal: 15,
-        borderRadius: 5,
-        height: 35,
-        marginLeft: 10,
-    },
-    loadButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    // --- AppTable & Pagination Styles ---
-    tableContainer: {
-        marginBottom: 20,
-    },
-    actionCell: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    paginationRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#1f3a8a',
-        paddingVertical: 10,
-        borderRadius: 8,
-    },
-    paginationText: {
-        color: '#fff',
-        fontSize: 16,
-        marginHorizontal: 5,
-    },
-    paginationControls: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginLeft: 20,
-    },
-    paginationButton: {
-        paddingHorizontal: 5,
-    },
-    pageSizeText: {
-        borderLeftWidth: 1,
-        borderLeftColor: '#fff',
-        paddingLeft: 10,
-        marginLeft: 5,
-    }
+  safeArea: { flex: 1, backgroundColor: '#fff' },
+  scrollContent: { flexGrow: 1, backgroundColor: '#f5f5f5', paddingHorizontal: 10 },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 15,
+    marginBottom: 20,
+  },
+  title: { fontSize: 20, fontWeight: 'bold', color: '#1f3a8a', marginLeft: 10 },
+  createNewButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1f3a8a',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  createNewButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  pickerRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
+  pickerGroup: { flex: 1, marginRight: 10 },
+  pickerContainer: { borderWidth: 1, borderColor: '#ccc', borderRadius: 5, height: 40, justifyContent: 'center' },
+//   picker: { height: 40 },
+  label: { fontSize: 12, color: '#666', marginBottom: 4 },
+  displayValue: { fontSize: 16, fontWeight: 'bold', color: '#333', paddingVertical: Platform.OS === 'ios' ? 8 : 4, borderBottomWidth: 1, borderBottomColor: '#ccc' },
+  resultsContainer: { marginBottom: 20 },
+  resultsTitle: { fontSize: 20, fontWeight: 'bold', color: '#333', marginBottom: 10 },
 });
 
 export default MidasSalesReturn;

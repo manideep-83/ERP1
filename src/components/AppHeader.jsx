@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const AppHeader = () => {
+const AppHeader = ({ route }) => {
   const navigation=useNavigation()
   const change=()=>{
     return navigation.goBack();
@@ -12,12 +12,15 @@ const AppHeader = () => {
     <View style={styles.headerContainer}>
       <View style={styles.headerContent}>
         
-        <TouchableOpacity onPress={change} >
-          <Image
-            source={require('../../Assets/Vector.png')} 
-            style={styles.logo}
-          />
-        </TouchableOpacity>
+         {route.name !== "Home" && (
+          <TouchableOpacity onPress={change}>
+            <Image
+              source={require('../../Assets/Vector.png')} 
+              style={styles.logo}
+            />
+          </TouchableOpacity>
+        )}
+        
 
         {/* Middle Section: Logo and Text */}
         <View style={styles.appInfoContainer}>

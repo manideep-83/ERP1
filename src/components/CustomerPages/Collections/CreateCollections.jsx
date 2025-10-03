@@ -3,9 +3,11 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Platfo
 import { Picker } from '@react-native-picker/picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AppTable from '../../../ReusableComponents/AppTable'; // Assuming this path is correct
+import { useNavigation } from '@react-navigation/native';
 
 const CreateCollections = () => {
     // --- State for Collection Form ---
+  const navigation = useNavigation();
     const [collectionType, setCollectionType] = useState('Fast collection');
     const [distributorBranch, setDistributorBranch] = useState('16622');
     const [salesman, setSalesman] = useState('SM01 - VAKASIRI VINOD KL');
@@ -37,26 +39,37 @@ const CreateCollections = () => {
         { id: 2, customerCode: 'CUST-002', retailerName: 'Retailer Beta', collectionMode: 'Card' },
     ];
 
-    // Table Column Configuration
-    const columns = [
-        { header: 'Customer Code', key: 'customerCode', flex: 2 },
-        { header: 'Retailer Name', key: 'retailerName', flex: 3 },
-        { header: 'Collection Mode', key: 'collectionMode', flex: 2 },
-        {
-            header: 'Action',
-            key: 'action',
-            flex: 1.5,
-            renderCell: (item) => (
-                <View style={styles.actionCell}>
-                    <TouchableOpacity onPress={() => console.log(`View customer ${item.customerCode}`)} style={{ marginRight: 10 }}>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => console.log(`Delete customer ${item.customerCode}`)}>
-                    </TouchableOpacity>
-                </View>
-            )
-        }
-    ];
+      const handleView = (item) => navigation.navigate('CollectionCreateOverview');
 
+    // Table Column Configuration
+  const columns = [
+    { header: 'Customer Code', key: 'customerCode', flex: 2 },
+    { header: 'Retailer Name', key: 'retailerName', flex: 3 },
+    { header: 'Collection Mode', key: 'collectionMode', flex: 2 },
+    {
+        header: 'Action',
+        key: 'action',
+        flex: 1.5,
+        renderCell: (item) => (
+            <View style={styles.actionCell}>
+                {/* View Button */}
+                <TouchableOpacity 
+                    onPress={() => handleView(item) } 
+                    style={{ marginRight: 10 }}
+                >
+                    <Ionicons name="eye-outline" size={20} color="#007bff" />
+                </TouchableOpacity>
+                
+                {/* Delete Button */}
+                <TouchableOpacity 
+                    onPress={() => console.log(`Delete customer ${item.customerCode}`)}
+                >
+                    <Ionicons name="trash-outline" size={20} color="#dc2626" />
+                </TouchableOpacity>
+            </View>
+        )
+    }
+];
     const handleAddAdjustment = () => console.log('Adding Collection Discount Adjustment...');
     const handleSave = () => console.log('Saving collection...');
     const handleDiscard = () => console.log('Discarding collection...');

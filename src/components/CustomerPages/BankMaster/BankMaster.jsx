@@ -1,233 +1,117 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TextInput, SafeAreaView, ScrollView, Alert, Platform } from 'react-native';
+import AppTable from '../../../ReusableComponents/AppTable';
+import AppButton from '../../../ReusableComponents/AppButton';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { Picker } from '@react-native-picker/picker'; // Retaining Picker for utility, though not used in this specific layout
-import AppTable from '../../../ReusableComponents/AppTable'; // Assuming this path is correct
+import { useNavigation } from '@react-navigation/native';
 
 const BankMaster = () => {
-    // --- State for Bank Master Form ---
-    const [distributorBranch, setDistributorBranch] = useState('16622- SRI VENKATESWARA AGENC');
-    const [bankNameInput, setBankNameInput] = useState('');
+  const navigation = useNavigation();
 
-    // --- Table Data (Banks) ---
-    const tableData = [
-        { id: 1, slNo: 1, bankName: 'SBI', branchDetails: 'Main Branch, HYD' },
-        { id: 2, slNo: 2, bankName: 'HDFC', branchDetails: 'Gachibowli' },
-    ];
+  const [distributorBranch] = useState('16622- SRI VENKATESWARA AGENC');
+  const [bankNameInput, setBankNameInput] = useState('');
 
-    // Table Column Configuration
-    const columns = [
-        { header: 'Sl.No', key: 'slNo', flex: 1 },
-        { header: 'Bank Name', key: 'bankName', flex: 3 },
-        { header: 'Branch Details', key: 'branchDetails', flex: 3 },
-        {
-            header: 'Action',
-            key: 'action',
-            flex: 1.5,
-            renderCell: (item) => (
-                <View style={styles.actionCell}>
-                    <TouchableOpacity onPress={() => console.log(`View bank ${item.bankName}`)} style={{ marginRight: 10 }}>
-                        <Ionicons name="eye-outline" size={20} color="#007bff" />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => console.log(`Delete bank ${item.bankName}`)}>
-                        <Ionicons name="trash-outline" size={20} color="#dc2626" />
-                    </TouchableOpacity>
-                </View>
-            )
-        }
-    ];
+  const [tableData, setTableData] = useState([
+    { id: 1, slNo: 1, bankName: 'SBI', branchDetails: 'Main Branch, HYD' },
+    { id: 2, slNo: 2, bankName: 'HDFC', branchDetails: 'Gachibowli' },
+  ]);
 
-    const handleAddBankName = () => {
-        if (bankNameInput.length >= 3) {
-            console.log(`Adding bank name: ${bankNameInput}`);
-            // Placeholder: Add logic to update tableData/state here
-            setBankNameInput('');
-        } else {
-            console.log('Bank Name must be at least 3 characters.');
-        }
-    };
+  const handleView = (item) => navigation.navigate('CollectionsOverview');
+  const handleDelete = (item) => {
+    Alert.alert('Delete', `Are you sure you want to delete ${item.bankName}?`, [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destruceetive', onPress: () => setTableData(prev => prev.filter(row => row.id !== item.id)) },
+    ]);
+  };
 
-    const handleSave = () => console.log('Saving Bank Master...');
-    const handleDiscard = () => console.log('Discarding changes...');
+  const handleAddBank = () => {
+    if (bankNameInput.length >= 3) {
+      const newBank = {
+        id: tableData.length + 1,
+        slNo: tableData.length + 1,
+        bankName: bankNameInput,
+        branchDetails: 'New Branch',
+      };
+      setTableData(prev => [...prev, newBank]);
+      setBankNameInput('');
+    } else {
+      Alert.alert('Error', 'Bank Name must be at least 3 characters.');
+    }
+  };
 
-    return (
-        <ScrollView style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerText}>Bank Master</Text>
-            </View>
+  const columns = [
+    { header: 'Sl.No', key: 'slNo', flex: 1 },
+    { header: 'Bank Name', key: 'bankName', flex: 3 },
+    { header: 'Branch Details', key: 'branchDetails', flex: 3 },
+    {
+      header: 'Action',
+      key: 'action',
+      flex: 1.5,
+      renderCell: (item) => (
+        <View style={{ flexDirection: 'row' }}>
+          <Ionicons name="eye-outline" size={20} color="#007bff" style={{ marginRight: 10 }} onPress={() => handleView(item)} />
+          <Ionicons name="trash-outline" size={20} color="#dc2626" onPress={() => handleDelete(item)} />
+        </View>
+      ),
+    },
+  ];
 
-            {/* --- Bank Master Input Form --- */}
-            <View style={styles.formContainer}>
-                
-                {/* Distributor Branch Display */}
-                <View style={[styles.row, { marginBottom: 20 }]}>
-                    <View style={styles.inputGroupFull}>
-                        <Text style={styles.label}>Distributor Branch</Text>
-                        <Text style={styles.displayValue}>{distributorBranch}</Text>
-                    </View>
-                </View>
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Header */}
+        <View style={styles.headerRow}>
+          <Text style={styles.headerText}>Bank Master</Text>
+        </View>
 
-                {/* Bank Name Input with Add Button */}
-                <View style={styles.bankNameRow}>
-                    <View style={[styles.inputGroupFull, { flex: 1 }]}>
-                        <Text style={styles.label}>Bank Name</Text>
-                        <TextInput 
-                            style={styles.input} 
-                            value={bankNameInput} 
-                            onChangeText={setBankNameInput} 
-                            placeholder="Enter at least 3 characters"
-                        />
-                    </View>
-                    <TouchableOpacity style={styles.addButton} onPress={handleAddBankName}>
-                        <Text style={styles.addButtonText}>Add</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
+        {/* Distributor Branch */}
+        <View style={styles.formContainer}>
+          <Text style={styles.label}>Distributor Branch</Text>
+          <Text style={styles.displayValue}>{distributorBranch}</Text>
 
-            {/* --- AppTable Component --- */}
-            <View style={styles.tableContainer}>
-                <AppTable
-                    columns={columns}
-                    data={tableData}
-                    message={tableData.length === 0 ? 'No matching record(s) found' : `Total Banks: ${tableData.length}`}
-                />
-            </View>
+          {/* Bank Input */}
+          <View style={styles.bankInputRow}>
+            <TextInput
+              style={styles.input}
+              value={bankNameInput}
+              onChangeText={setBankNameInput}
+              placeholder="Enter at least 3 characters"
+            />
+            <AppButton
+              label="Add Bank"
+              onPress={handleAddBank}
+              style={styles.addButton}
+              textStyle={styles.addButtonText}
+            />
+          </View>
+        </View>
 
-            {/* --- Action Buttons --- */}
-            <View style={styles.buttonRow}>
-                <TouchableOpacity style={[styles.actionButton, styles.saveButton]} onPress={handleSave}>
-                    <Text style={styles.buttonText}>Save</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.actionButton, styles.discardButton]} onPress={handleDiscard}>
-                    <Text style={styles.buttonText}>Discard</Text>
-                </TouchableOpacity>
-            </View>
-        </ScrollView>
-    );
+        {/* Table */}
+        <View style={styles.tableContainer}>
+          <AppTable
+            columns={columns}
+            data={tableData}
+            message={tableData.length === 0 ? 'No matching record(s) found' : `Total Banks: ${tableData.length}`}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f5f5f5',
-        padding: 10,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        paddingVertical: 15,
-        marginBottom: 20,
-    },
-    headerText: {
-        fontSize: 30,
-        fontWeight: 'bold',
-        color: '#1f3a8a',
-        marginLeft: 10,
-    },
-    // --- Form Container ---
-    formContainer: {
-        backgroundColor: '#fff',
-        padding: 20,
-        borderRadius: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 3,
-        marginBottom: 20,
-    },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 15,
-    },
-    inputGroupFull: {
-        flex: 1,
-    },
-    label: {
-        fontSize: 12,
-        color: '#666',
-        marginBottom: 2,
-    },
-    input: {
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-        paddingVertical: Platform.OS === 'ios' ? 8 : 4,
-        fontSize: 16,
-    },
-    displayValue: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-        paddingVertical: Platform.OS === 'ios' ? 8 : 4,
-    },
-    // Bank Name Input Row
-    bankNameRow: {
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        justifyContent: 'space-between',
-        paddingBottom: 20,
-    },
-    addButton: {
-        backgroundColor: '#1f3a8a',
-        paddingVertical: 8,
-        paddingHorizontal: 15,
-        borderRadius: 5,
-        height: 35,
-        marginLeft: 10,
-    },
-    addButtonText: {
-        color: '#fff',
-        fontSize: 14,
-        fontWeight: 'bold',
-    },
-    // --- Table & Action Styles ---
-    tableContainer: {
-        marginBottom: 20,
-    },
-    actionCell: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    buttonRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        paddingHorizontal: 5,
-        marginBottom: 20,
-        marginTop: 10,
-    },
-    actionButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-        marginHorizontal: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-        elevation: 3,
-    },
-    saveButton: {
-        backgroundColor: '#1f3a8a',
-    },
-    discardButton: {
-        backgroundColor: '#dc2626',
-    },
-    buttonIcon: {
-        marginRight: 8,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
+  safeArea: { flex: 1, backgroundColor: '#fff' },
+  scrollContent: { flexGrow: 1, padding: 10, backgroundColor: '#f5f5f5' },
+  headerRow: { marginBottom: 20 },
+  headerText: { fontSize: 24, fontWeight: 'bold', color: '#1f3a8a', marginLeft: 10 },
+  formContainer: { backgroundColor: '#fff', padding: 15, borderRadius: 10, marginBottom: 20, elevation: 3 },
+  label: { fontSize: 12, color: '#666', marginBottom: 5 },
+  displayValue: { fontSize: 16, fontWeight: 'bold', color: '#333', borderBottomWidth: 1, borderBottomColor: '#ccc', paddingVertical: Platform.OS === 'ios' ? 8 : 4, marginBottom: 15 },
+  bankInputRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  input: { flex: 1, borderBottomWidth: 1, borderBottomColor: '#ccc', fontSize: 16, paddingVertical: Platform.OS === 'ios' ? 8 : 4, marginRight: 10 },
+  addButton: { backgroundColor: '#1f3a8a', paddingVertical: 10, paddingHorizontal: 15, borderRadius: 5 },
+  addButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
+  tableContainer: { marginBottom: 20 },
 });
 
 export default BankMaster;

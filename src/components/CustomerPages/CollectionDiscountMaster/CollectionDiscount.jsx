@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Alert, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import SearchBar from '../../../ReusableComponents/SearchBar';
 import AppTable from '../../../ReusableComponents/AppTable';
 import AppButton from '../../../ReusableComponents/AppButton';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
 
-const SalesReturn = () => {
+const CollectionDiscount = () => {
   const navigation = useNavigation();
+
   const [data, setData] = useState([
-    { id: 1, branch: 'B001', refNo: 'REF123', date: '12-08-2023', name: 'Sales Return A' },
-    { id: 2, branch: 'B002', refNo: 'REF456', date: '12-09-2023', name: 'Sales Return B' },
+    { id: 1, name: 'Product A', date: '12-08-2023' },
+    { id: 2, name: 'Product B', date: '12-09-2023' },
   ]);
 
-  const handleView = (item) => navigation.navigate('SalesReturnOverview', { item });
+  const handleView = (item) => navigation.navigate('CollectionDiscountOverview', { item });
 
   const handleDelete = (item) => {
     Alert.alert(
@@ -21,7 +22,7 @@ const SalesReturn = () => {
       `Are you sure you want to delete ${item.name}?`,
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => setData(prev => prev.filter(row => row.id !== item.id)) }
+        { text: 'Delete', style: 'destructive', onPress: () => setData(prev => prev.filter(row => row.id !== item.id)) },
       ]
     );
   };
@@ -29,10 +30,8 @@ const SalesReturn = () => {
   const handleDateSelect = (date) => console.log('Selected date:', date);
 
   const columns = [
-    { header: 'SL No', key: 'id', flex: 1 },
-    { header: 'Branch Code', key: 'branch', flex: 2 },
-    { header: 'Reference No', key: 'refNo', flex: 2 },
-    { header: 'Date', key: 'date', flex: 2 },
+    { header: 'Reference No', key: 'id', flex: 1 },
+    { header: 'Customer Type', key: 'name', flex: 2 },
     {
       header: 'Action',
       key: 'action',
@@ -53,12 +52,12 @@ const SalesReturn = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header Row */}
+        {/* Header */}
         <View style={styles.headerRow}>
-          <Text style={styles.title}>Sales Return</Text>
+          <Text style={styles.title}>Collection Discount Master</Text>
           <AppButton
             label="+ Create New"
-            onPress={() => navigation.navigate('CreateSalesReturn')}
+            onPress={() => navigation.navigate('CreateCollectionDiscount')}
             style={styles.createNewButton}
             textStyle={styles.createNewButtonText}
           />
@@ -66,12 +65,12 @@ const SalesReturn = () => {
 
         {/* Search Bar */}
         <SearchBar
-          placeholder="Search Sales Return"
+          placeholder="Search Product"
           showDatePicker={true}
           onDateChange={handleDateSelect}
         />
 
-        {/* Results Table */}
+        {/* Table */}
         <View style={styles.resultsContainer}>
           <Text style={styles.resultsTitle}>Search Results</Text>
           <AppTable
@@ -87,13 +86,13 @@ const SalesReturn = () => {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
-  scrollContent: { flexGrow: 1, backgroundColor: '#f5f5f5', paddingHorizontal: 10 },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 15, marginBottom: 20 },
+  scrollContent: { flexGrow: 1, padding: 10, backgroundColor: '#f5f5f5' },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   title: { fontSize: 20, fontWeight: 'bold', color: '#1f3a8a', marginLeft: 10 },
-  createNewButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1f3a8a', paddingVertical: 10, paddingHorizontal: 15, borderRadius: 5, marginRight: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 3 },
+  createNewButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1f3a8a', paddingVertical: 10, paddingHorizontal: 15, borderRadius: 5 },
   createNewButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  resultsContainer: { marginBottom: 20 },
+  resultsContainer: { marginTop: 10 },
   resultsTitle: { fontSize: 20, fontWeight: 'bold', color: '#333', marginBottom: 10 },
 });
 
-export default SalesReturn;
+export default CollectionDiscount;
