@@ -1,5 +1,5 @@
+import React, { useState, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -14,27 +14,41 @@ import {
   Alert,
 } from 'react-native';
 
+import { UserContext } from '../B2C/Context/UserContext'; // Correct path to your UserContext
+
 const LoginScreen = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
 
+  // Correctly use useContext to access the context value
+  const { setUsername: setContextUsername } = useContext(UserContext);
+
   const change = () => {
-    return navigation.navigate('ForgotPassword');
+    navigation.navigate('ForgotPassword');
   };
 
-  // ✅ Dummy credentials
-  const DUMMY_USER = "BP_ADMIN";
-  const DUMMY_PASS = "1234";
+  // Dummy credentials
+  const DUMMY_CREDENTIALS = [
+    { user: 'Business', pass: '1234', screen: 'HomeB2C' },
+    { user: 'Customer', pass: '1234', screen: 'HomeB2C' },
+  ];
 
   const onLogin = () => {
-    if (username === DUMMY_USER && password === DUMMY_PASS) {
-      // ✅ Successful login
-      Alert.alert("Login Successful", "Welcome back!", [
-        { text: "OK", onPress: () => navigation.navigate("Home") }
+    const foundUser = DUMMY_CREDENTIALS.find(
+      cred => cred.user === username && cred.pass === password
+    );
+
+    if (foundUser) {
+      // Set the username in your context
+      setContextUsername(foundUser.user); 
+
+      // Navigate to the user's appropriate home screen
+      Alert.alert("Login Successful", `Welcome back, ${foundUser.user}!`, [
+        { text: "OK", onPress: () => navigation.navigate(foundUser.screen, { username: foundUser.user }) }
       ]);
     } else {
-      // ❌ Invalid credentials
+      // Invalid credentials
       Alert.alert("Login Failed", "Invalid username or password");
     }
   };
@@ -118,11 +132,6 @@ const styles = StyleSheet.create({
     color: '#d1d5db',
     marginBottom: 20,
     textAlign: 'center',
-  },
-  logo: {
-    width: 150,
-    height: 70,
-    marginBottom: 5,
   },
   logoText: {
     fontSize: 24,

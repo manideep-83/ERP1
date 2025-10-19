@@ -4,16 +4,21 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const AppHeader = ({ route }) => {
-  const navigation=useNavigation()
-  const change=()=>{
+  // Use the hook to get the navigation object
+  const navigation = useNavigation();
+
+  // Function to go back to the previous screen
+  const change = () => {
     return navigation.goBack();
   };
+
   return (
     <View style={styles.headerContainer}>
       <View style={styles.headerContent}>
-        
-         {route.name !== "Home" && (
+        {/* Left Section: Back Button (conditionally rendered) */}
+        {(route.name !== "HomeB2C" && route.name !== "Orders" && route.name !== "Payments" && route.name !== "Returns" && route.name !== "Products") && (
           <TouchableOpacity onPress={change}>
+            {/* Note: This requires the correct path to your image asset */}
             <Image
               source={require('../../Assets/Vector.png')} 
               style={styles.logo}
@@ -21,39 +26,40 @@ const AppHeader = ({ route }) => {
           </TouchableOpacity>
         )}
         
-
         {/* Middle Section: Logo and Text */}
         <View style={styles.appInfoContainer}>
-          {/* You would replace this with your actual app logo image */}
+          {/* App Logo */}
           <Image
             source={require('../../Assets/Home/Vector-1.png')} 
             style={styles.logo}
           />
           <View>
             <Text style={styles.title}>Bahupada</Text>
-            <Text style={styles.subtitle}>Distributor Panel</Text>
           </View>
         </View>
 
-        {/* Right Side: Icons */}
+        {/* Right Side: Icons (Cart and Profile) */}
         <View style={styles.iconGroup}>
-          <TouchableOpacity style={styles.iconButton}>
+          {/* Cart Icon: onPress moved to TouchableOpacity */}
+          <TouchableOpacity 
+            style={styles.iconButton} 
+            onPress={() => navigation.navigate('Cart')} // <-- FIX APPLIED HERE
+          >
             <Image
-            source={require('../../Assets/login/Vector-1.png')} 
-            style={styles.logo}
+              source={require('../../Assets/shopping_cart.png')} 
+              style={styles.logo}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
-           <Image
-            source={require('../../Assets/bell.png')} 
-            style={styles.logo}
+          
+          {/* Profile Icon: onPress moved to TouchableOpacity */}
+          <TouchableOpacity 
+            style={styles.iconButton} 
+            onPress={() => navigation.navigate('Profile')} // <-- FIX APPLIED HERE
+          >
+            <Image
+              source={require('../../Assets/login/Vector-3.png')} 
+              style={styles.logo}
             />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
-             <Image
-            source={require('../../Assets/login/Vector-3.png')} 
-            style={styles.logo}
-          />
           </TouchableOpacity>
         </View>
       </View>
