@@ -1,17 +1,24 @@
-import React from 'react';
+import React, { useContext ,useEffect} from 'react';
 import { View, Text,StyleSheet,TouchableOpacity } from 'react-native';
 import SearchBar from '../../ReusableComponents/SearchBar';
 import AppTable from '../../ReusableComponents/AppTable';
 import { useNavigation } from '@react-navigation/native';
-
+import ERPContext from '../../Context/ERPContext';
 const ProductAndPricing = () => {
   const navigation=useNavigation()
+  const { fetchProduct,product,loading} = useContext(ERPContext);
      const change=(name)=>{
         // console.error("pressed",id);
          return navigation.navigate(name);
       }
+      useEffect(() => {
+          fetchProduct();
+        }, []);
+         const handleView = (item) => {
+    navigation.navigate('PAPOverview', { product: item });
+  };
    const columns = [
-  { header: 'Product Code', key: 'id', flex: 1 },
+  { header: 'Product Code', key: 'item_id', flex: 1 },
   { header: 'Product Name', key: 'name', flex: 2 },
   { header: 'Distributor Product Code', key: 'id', flex: 2 },
   // { header: 'Action', key: 'date', flex: 2 },
@@ -21,12 +28,12 @@ const ProductAndPricing = () => {
     key: 'action', 
     flex: 1,
     renderCell: (item) => (
-      <TouchableOpacity onPress={() => change("PAPOverview")}>
-        <Text>Show</Text>
-        {/* <Ionicons name="eye-outline" size={20} color="#007bff" /> */}
-      </TouchableOpacity>
-      
-    )
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+              <TouchableOpacity onPress={() => handleView(item)} style={{ marginRight: 10 }}>
+                 <Text>Show</Text>
+              </TouchableOpacity>
+            </View>
+          ),
   }
 ];
 
@@ -49,8 +56,8 @@ const data = [
       
     <AppTable 
         columns={columns} 
-        data={data} 
-        message={`Total Records: ${data.length}`} 
+        data={product} 
+        message={loading ? 'Loading...' : `Total Records: ${product.length}`} 
       />
     </View>
   );

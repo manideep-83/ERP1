@@ -211,6 +211,7 @@ import StockAdjustmentOverview from '../components/InventoryPages/StockAdjustmen
 import BatchTransfer from '../components/InventoryPages/BatchTransfer/BatchTransfer'
 import BatchTransferOverview from '../components/InventoryPages/BatchTransfer/BatchTransferOverview'
 import CreateBatchTransfer from '../components/InventoryPages/BatchTransfer/CreateBatchTransfer'
+import  createPurchaseOrder  from '../components/CompanyPages/Purchase/CreatePurchaseOrder';
 const Routes = () => {
     const Stack= createNativeStackNavigator()
   return (
@@ -404,6 +405,7 @@ const Routes = () => {
           {/* 📌 Purchase Order */}
           <Stack.Screen name="PurchaseOrder" component={PurchaseOrder} />
           <Stack.Screen name="PurchaseOrderOverview" component={PurchaseOrderOverview} />
+          <Stack.Screen name="CreateNewPO" component={createPurchaseOrder} />
           <Stack.Screen name="CreateNewPROverview" component={CreateNewPROverview} />
 
           {/* 📌 Purchase Return */}

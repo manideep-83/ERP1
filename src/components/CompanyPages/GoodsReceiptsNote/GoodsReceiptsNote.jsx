@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useContext } from 'react';
+import ERPContext from '../../../Context/ERPContext';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import SearchBar from '../../../ReusableComponents/SearchBar';
 import AppTable from '../../../ReusableComponents/AppTable';
@@ -8,6 +9,11 @@ import { useNavigation } from '@react-navigation/native';
 
 const GoodsReceiptsNote = () => {
   const navigation = useNavigation();
+  const { GRN, fetchGRN, loading } = useContext(ERPContext);
+
+  useEffect(() => {
+      fetchGRN();
+    }, []);
   const handleDateSelect = (date) => {
     console.log("Selected date:", date);
   };
@@ -32,10 +38,10 @@ const GoodsReceiptsNote = () => {
   };
 
   const columns = [
-    { header: 'Code', key: 'id', flex: 1 },
-    { header: 'Company Name', key: 'name', flex: 2 },
-    { header: 'Supplier Name', key: 'name', flex: 2 },
-    { header: 'Geo Mapping', key: 'name', flex: 2 },
+    { header: 'Branch Code', key: 'id', flex: 1 },
+    { header: 'Reference No', key: 'purchaseorder_number', flex: 2 },
+    { header: 'Supplier Name', key: 'vendor_name', flex: 2 },
+    { header: 'Amount', key: 'name', flex: 2 },
     {
       header: 'Action',
       key: 'action',
@@ -53,10 +59,7 @@ const GoodsReceiptsNote = () => {
     },
   ];
 
-  const data = [
-    { id: 1, name: 'Product A' },
-    { id: 2, name: 'Product B' },
-  ];
+ 
 
   return (
     <View style={styles.container}>
@@ -79,8 +82,8 @@ const GoodsReceiptsNote = () => {
       <Text style={styles.resultsTitle}>Search Results</Text>
       <AppTable
         columns={columns}
-        data={data}
-        message={`Total Records: ${data.length}`}
+        data={GRN}
+        message={loading ? 'Loading...' : `Total Records: ${GRN.length}`}
       />
     </View>
   );

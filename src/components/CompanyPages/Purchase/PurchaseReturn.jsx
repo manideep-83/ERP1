@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useContext } from 'react';
+import ERPContext from '../../../Context/ERPContext';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import SearchBar from '../../../ReusableComponents/SearchBar';
 import AppTable from '../../../ReusableComponents/AppTable';
@@ -8,7 +9,10 @@ import { useNavigation } from '@react-navigation/native';
 
 const PurchaseReturn = () => {
   const navigation = useNavigation();
-
+  const { PR, fetchPR, loading } = useContext(ERPContext);
+  useEffect(() => {
+      fetchPR();
+    }, []);
   const handleDateSelect = (date) => {
     console.log("Selected date:", date);
   };
@@ -18,7 +22,7 @@ const PurchaseReturn = () => {
   };
 
   const handleView = (item) => {
-    navigation.navigate('PurchaseReturnOverview');
+    navigation.navigate('PurchaseReturnOverview', { pr: item });
   };
 
   const handleDelete = (itemToDelete) => {
@@ -37,10 +41,10 @@ const PurchaseReturn = () => {
   };
 
   const columns = [
-    { header: 'Branch Code', key: 'id', flex: 1 },
-    { header: 'GRN Ref No', key: 'name', flex: 2 },
+    { header: 'Branch Code', key: 'vendor_credit_id', flex: 1 },
+    { header: 'GRN Ref No', key: 'reference_number', flex: 2 },
     { header: 'Company Inv No', key: 'name', flex: 2 },
-    { header: 'Amount', key: 'name', flex: 2 },
+    { header: 'Amount', key: 'total', flex: 2 },
     { 
       header: 'Action', 
       key: 'action', 
@@ -48,20 +52,19 @@ const PurchaseReturn = () => {
       renderCell: (item) => (
         <View style={styles.actionCell}>
           <TouchableOpacity onPress={() => handleView(item)} style={{ marginRight: 10 }}>
-            <Ionicons name="eye-outline" size={20} color="#007bff" />
+            <Text>S</Text>
+            {/* <Ionicons name="eye-outline" size={20} color="#007bff" /> */}
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleDelete(item)}>
-            <Ionicons name="trash-outline" size={20} color="#dc2626" />
+            <Text>D</Text>
+            {/* <Ionicons name="trash-outline" size={20} color="#dc2626" /> */}
           </TouchableOpacity>
         </View>
       )
     }
   ];
 
-  const data = [
-    { id: 1, name: 'Product A' },
-    { id: 2, name: 'Product B' },
-  ];
+ 
 
   return (
     <View style={styles.container}>
@@ -84,8 +87,8 @@ const PurchaseReturn = () => {
       <Text style={styles.subTitle}>Search Results</Text>
       <AppTable
         columns={columns}
-        data={data}
-        message={`Total Records: ${data.length}`}
+        data={PR}
+        message={loading ? 'Loading...' : `Total Records: ${PR.length}`}
       />
     </View>
   );

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useContext } from 'react';
+import ERPContext from '../../../Context/ERPContext';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import SearchBar from '../../../ReusableComponents/SearchBar';
 import AppTable from '../../../ReusableComponents/AppTable';
@@ -8,13 +9,18 @@ import { useNavigation } from '@react-navigation/native';
 
 const PurchaseOrder = () => {
   const navigation = useNavigation();
+  const { PO, fetchPO, loading } = useContext(ERPContext);
 
+  useEffect(() => {
+      fetchPO();
+    }, []);
   const handleDateSelect = (date) => {
     console.log("Selected date:", date);
   };
 
+
   const handleCreateNew = () => {
-    navigation.navigate(''); // <-- Navigate to create screen
+   navigation.navigate('CreateNewPO'); // <-- Navigate to create screen
   };
 
   const handleView = (item) => {
@@ -33,10 +39,10 @@ const PurchaseOrder = () => {
   };
 
   const columns = [
-    { header: 'Branch Code', key: 'id', flex: 1 },
-    { header: 'PO Reference No', key: 'name', flex: 2 },
-    { header: 'Company PO No', key: 'name', flex: 2 },
-    { header: 'PO Reference No', key: 'name', flex: 2 },
+    { header: 'Branch Code', key: 'purchaseorder_id', flex: 1 },
+    { header: 'PO Reference No', key: 'purchaseorder_number', flex: 2 },
+    { header: 'Company PO No', key: 'company_name', flex: 2 },
+    { header: 'Amount', key: 'total', flex: 2 },
     {
       header: 'Action',
       key: 'action',
@@ -44,20 +50,18 @@ const PurchaseOrder = () => {
       renderCell: (item) => (
         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
           <TouchableOpacity onPress={() => handleView(item)} style={{ marginRight: 10 }}>
-            <Ionicons name="eye-outline" size={20} color="#007bff" />
+            {/* <Ionicons name="eye-outline" size={20} color="#007bff" /> */}
+            <Text>S</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleDelete(item)}>
-            <Ionicons name="trash-outline" size={20} color="#dc2626" />
+            {/* <Ionicons name="trash-outline" size={20} color="#dc2626" /> */}
+            <Text>D</Text>
           </TouchableOpacity>
         </View>
       ),
     },
   ];
 
-  const data = [
-    { id: 1, name: 'Product A' },
-    { id: 2, name: 'Product B' },
-  ];
 
   return (
     <View style={styles.container}>
@@ -80,8 +84,8 @@ const PurchaseOrder = () => {
       <Text style={styles.subTitle}>Search Results</Text>
       <AppTable
         columns={columns}
-        data={data}
-        message={`Total Records: ${data.length}`}
+        data={PO}
+         message={loading ? 'Loading...' : `Total Records: ${PO.length}`}
       />
     </View>
   );

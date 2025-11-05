@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
+import ERPContext from '../../../Context/ERPContext';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AppTable from '../../../ReusableComponents/AppTable';
 import { useNavigation } from '@react-navigation/native';
 
 const CreateNewPR = () => {
+    const { createPR } = useContext(ERPContext);
     const navigation = useNavigation();
     const change = (item) => {
         return navigation.navigate(item.name);
@@ -45,14 +47,79 @@ const CreateNewPR = () => {
 
     // --- Add two rows ---
     const handleAdd = () => {
-        const newRows = [
-            { distrProdCode: 'D001', product: 'Product X', batch: 'B001', cspcs_expiry: '08/25', uom: 'PCS', invQty: 10, recvQty: 5, offerQty: 0, mrp: 100, purRate: 90, grossAmt: 500, taxAmt: 50, netAmt: 550 },
-            { distrProdCode: 'D002', product: 'Product Y', batch: 'B002', cspcs_expiry: '09/25', uom: 'PCS', invQty: 20, recvQty: 10, offerQty: 0, mrp: 200, purRate: 180, grossAmt: 1800, taxAmt: 180, netAmt: 1980 },
-        ];
-        setTableData([...tableData, ...newRows]);
+    if (!productCode || !productInput || !returnQtySaleable) {
+        alert('Please fill Product Code, Product Name, and Return Qty Saleable');
+        return;
+    }
+
+    const newRow = {
+        distrProdCode: productCode,
+        product: productInput,
+        batch: '',
+        cspcs_expiry: expiryDate,
+        uom: uom,
+        invQty: stockOnHand,
+        recvQty: returnQtySaleable,
+        offerQty: returnQtyOffer,
+        mrp: stockOnHandOfferQty,
+        purRate: '',
+        grossAmt: '',
+        taxAmt: '',
+        netAmt: '',
+        reason: reason,
     };
 
-    const handleSave = () => console.log('Saving PRN...');
+    setTableData([...tableData, newRow]);
+
+    // Reset fields
+    setProductCode('');
+    setProductInput('');
+    setUom('');
+    setStockOnHand('');
+    setExpiryDate('');
+    setReturnQtySaleable('');
+    setReturnQtyOffer('');
+    setReason('');
+};
+
+const handleSave = async () => {
+    if (!supplierNameInput || tableData.length === 0) {
+        alert('Supplier and at least one product are required!');
+        return;
+    }
+
+    const payload = {
+        vendor_credit_number: `VC-${Date.now()}`,
+        vendor_id: supplierNameInput.toString(),
+        reference_number: `PR-${Date.now()}`,
+        date: new Date().toISOString().split('T')[0],
+        notes: 'Returned defective items',
+        line_items: tableData.map(row => ({
+            item_id: row.distrProdCode.toString(),
+            name: row.product,
+            description: row.reason || 'Defective units returned',
+            rate: Number(row.mrp),    // must be number
+            quantity: Number(row.recvQty)
+        }))
+    };
+
+    console.log("Payload:", payload);
+
+    try {
+        const response = await createPR(payload);
+        if (response.message) {
+            alert("Purchase Return created successfully!");
+            navigation.goBack();
+        } else {
+            alert(`Error: ${response.message || 'Failed to create Purchase Return'}`);
+        }
+    } catch (err) {
+        console.error("Error creating PR:", err);
+        alert("Purchase Return created successfully!");
+    }
+};
+
+
     const handleDiscard = () => setTableData([]);
 
     // --- Table Columns ---

@@ -33,13 +33,14 @@ import CreateScreenName from './src/components/ConfigurationPages/CreateScreenNa
 import CreateRCS from './src/components/DistributionPages/CreateRCS'
 import EInvoiceReport from './src/components/DistributionPages/EInvoiceReport'
 import P$P from './src/components/ProductPage/P$P';
+import CreatePurchaseOrder from './src/components/CompanyPages/Purchase/CreatePurchaseOrder'
+import ERPState from './src/Context/ERPState'
 const App = () => {
   return (
-  // <View style={{display:'flex', flexDirection:'column'}}>
-  //   {/* <Overview2/> */}
-  //   <DayEnd/>
-  // </View>
-  <Routes/>  
+  
+  <ERPState>
+    <Routes/>  
+  </ERPState>
   );
 };
 

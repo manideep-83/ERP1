@@ -1,21 +1,18 @@
-import React from 'react';
+import React, { useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import ERPContext from '../../../Context/ERPContext'; // adjust path
 import SearchBar from '../../../ReusableComponents/SearchBar';
 import AppTable from '../../../ReusableComponents/AppTable';
-import AppButton from '../../../ReusableComponents/AppButton';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 
 const Supplier = () => {
   const navigation = useNavigation();
+  const { suppliers, fetchSuppliers, loading } = useContext(ERPContext);
 
-  const handleDateSelect = (date) => {
-    console.log("Selected date:", date);
-  };
-
-  const handleCreateNew = () => {
-    navigation.navigate('SupplierOverview');
-  };
+  useEffect(() => {
+    fetchSuppliers();
+  }, []);
 
   const handleView = (item) => {
     navigation.navigate('SupplierOverview', { supplier: item });
@@ -24,7 +21,7 @@ const Supplier = () => {
   const handleDelete = (item) => {
     Alert.alert(
       'Delete Supplier',
-      `Are you sure you want to delete ${item.name}?`,
+      `Are you sure you want to delete ${item.vendor_name}?`,
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Delete', style: 'destructive', onPress: () => console.log('Deleted', item) },
@@ -33,10 +30,9 @@ const Supplier = () => {
   };
 
   const columns = [
-    { header: 'Code', key: 'id', flex: 1 },
-    { header: 'Company Name', key: 'name', flex: 2 },
-    { header: 'Supplier Name', key: 'name', flex: 2 },
-    { header: 'Geo Mapping', key: 'name', flex: 2 },
+    { header: 'ID', key: 'contact_id', flex: 1 },
+    { header: 'Company Name', key: 'company_name', flex: 2 },
+    { header: 'Supplier Name', key: 'vendor_name', flex: 2 },
     {
       header: 'Action',
       key: 'action',
@@ -44,40 +40,29 @@ const Supplier = () => {
       renderCell: (item) => (
         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
           <TouchableOpacity onPress={() => handleView(item)} style={{ marginRight: 10 }}>
-            <Ionicons name="eye-outline" size={20} color="#007bff" />
+             <Text>S</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleDelete(item)}>
-            <Ionicons name="trash-outline" size={20} color="#dc2626" />
+            <Text>D</Text>
           </TouchableOpacity>
         </View>
       ),
     },
   ];
 
-  const data = [
-    { id: 1, name: 'Product A' },
-    { id: 2, name: 'Product B' },
-  ];
-
   return (
     <View style={{ flex: 1, backgroundColor: '#f5f5f5', padding: 10 }}>
-      {/* Header Row with Create New button */}
       <View style={styles.headerRow}>
         <Text style={styles.title}>Supplier</Text>
-    
       </View>
 
-      <SearchBar
-        placeholder="Search Product"
-        showDatePicker={true}
-        onDateChange={handleDateSelect}
-      />
+      <SearchBar placeholder="Search Supplier" showDatePicker={true} onDateChange={() => {}} />
 
       <Text style={styles.resultsTitle}>Search Results</Text>
       <AppTable
         columns={columns}
-        data={data}
-        message={`Total Records: ${data.length}`}
+        data={suppliers}
+        message={loading ? 'Loading...' : `Total Records: ${suppliers.length}`}
       />
     </View>
   );
