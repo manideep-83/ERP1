@@ -7,10 +7,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import AppButton from '../../../ReusableComponents/AppButton';
 import ERPContext from '../../../Context/ERPContext';
 
-const OrderBooking = () => {
-  const { FetchSO, salesorder, loading } = useContext(ERPContext);
+const B2CCustomer = () => {
+  const { FetchB2C, b2c, loading } = useContext(ERPContext);
     useEffect(() => {
-        FetchSO();
+        FetchB2C();
       }, []);
   const navigation = useNavigation();
 
@@ -18,7 +18,7 @@ const OrderBooking = () => {
     console.log('Selected date:', date);
   };
 
-  const handleView = (item) => navigation.navigate('OrderBookingOverview', { item });
+  const handleView = (item) => navigation.navigate('RetailerOverview', { item });
 
   const handleDelete = (item) => {
     Alert.alert('Delete', `Are you sure you want to delete ${item.name}?`, [
@@ -28,11 +28,11 @@ const OrderBooking = () => {
   };
 
   const columns = [
-    { header: 'Order ID', key: 'salesorder_number', flex: 2 },
-    { header: 'Customer Name', key: 'customer_name', flex: 2 },
-    { header: 'Order Date', key: 'date', flex: 2 },
-    { header: 'Price', key: 'total', flex: 2 },
-
+    { header: 'Outlet Name', key: 'company_name', flex: 2 },
+    { header: 'Owner Name', key: 'contact_name', flex: 2 },
+    { header: 'Outlet Category', key: 'custom_fields.outlet_category', flex: 2 },
+    { header: 'Outstanding', key: 'custom_fields.available_credit', flex: 2 },
+    { header: 'outlet id', key: 'custom_fields.outlet_id', flex: 2 },
     {
       header: 'Action',
       key: 'action',
@@ -40,32 +40,28 @@ const OrderBooking = () => {
       renderCell: (item) => (
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity onPress={() => handleView(item)} style={{ marginRight: 12 }}>
-            <Ionicons name="eye-outline" size={20} color="#2563eb" />
+            <Text>👁️</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleDelete(item)}>
-            <Ionicons name="trash-outline" size={20} color="#dc2626" />
+          <Text>🗑️</Text>
           </TouchableOpacity>
         </View>
       )
     }
   ];
 
-  const data = [
-    { id: 1, name: 'Product A', date: '12-08-2023' },
-    { id: 2, name: 'Product B', date: '12-09-2023' },
-  ];
 
   return (
     <View style={styles.container}>
       {/* Header with Create Button */}
       <View style={styles.headerRow}>
-        <Text style={styles.title}>Order Booking</Text>
-        <AppButton
-          label="Create New"
-          onPress={() => navigation.navigate('CreateOrderBooking')} 
-          style={styles.createNewButton}
-          textStyle={styles.createNewButtonText}
-        />
+        <Text style={styles.title}>B2C Customers</Text>
+        <AppButton 
+            label="Create New"
+            onPress={() => navigation.navigate("CreateCustomer")}
+            style={styles.createButton}
+            textStyle={styles.createButtonText}
+          />
       </View>
 
       {/* Search Bar */}
@@ -80,8 +76,8 @@ const OrderBooking = () => {
       {/* Data Table */}
       <AppTable
         columns={columns}
-        data={salesorder}
-        message={loading ? 'Loading...' : `Total Records: ${salesorder.length}`}
+        data={b2c}
+        message={loading ? 'Loading...' : `Total Records: ${b2c.length}`}
       />
     </View>
   );
@@ -110,6 +106,17 @@ const styles = StyleSheet.create({
     marginVertical: 12, 
     color: '#374151' 
   },
+  createButton: {
+    backgroundColor: "#1f3a8a",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 6
+  },
+  createButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
   createNewButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -130,4 +137,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OrderBooking;
+export default B2CCustomer;

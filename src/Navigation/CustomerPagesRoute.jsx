@@ -38,6 +38,7 @@ import SalesReturn from '../components/CustomerPages/SalesReturn/SalesReturn';
 import SalesReturnOverview from '../components/CustomerPages/SalesReturn/SalesReturnOverview';
 import CreateNewSalesReturn from '../components/CustomerPages/SalesReturn/CreateNewSalesReturn';
 import DeliveryProcess from '../components/CustomerPages/SalesReturn/DeliveryProcess';
+import B2CCustomer from '../components/CustomerPages/Retailer/B2CCustomer';
 
 const Stack = createStackNavigator();
 
@@ -79,6 +80,7 @@ const CustomerPagesRoute = () => (
     <Stack.Screen name="SalesReturnOverview" component={SalesReturnOverview} />
     <Stack.Screen name="CreateNewSalesReturn" component={CreateNewSalesReturn} />
     <Stack.Screen name="DeliveryProcess" component={DeliveryProcess} />
+    <Stack.Screen name="B2CCustomer" component={B2CCustomer} />
   </Stack.Navigator>
 );
 

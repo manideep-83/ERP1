@@ -166,7 +166,7 @@ import Collections from '../components/CustomerPages/Collections/Collections'
 import CollectionsOverview from '../components/CustomerPages/Collections/CollectionsOverview'
 import CreateCollections from '../components/CustomerPages/Collections/CreateCollections'
 import CollectionCreateOverview from '../components/CustomerPages/Collections/CollectionCreateOverview'
-
+import B2CCustomer from '../components/CustomerPages/Retailer/B2CCustomer'
 import Retailer from '../components/CustomerPages/Retailer/Retailer'
 import RetailerOverview from '../components/CustomerPages/Retailer/RetailerOverview'
 import DeliveryProcess from '../components/CustomerPages/SalesReturn/DeliveryProcess'
@@ -212,6 +212,7 @@ import BatchTransfer from '../components/InventoryPages/BatchTransfer/BatchTrans
 import BatchTransferOverview from '../components/InventoryPages/BatchTransfer/BatchTransferOverview'
 import CreateBatchTransfer from '../components/InventoryPages/BatchTransfer/CreateBatchTransfer'
 import  createPurchaseOrder  from '../components/CompanyPages/Purchase/CreatePurchaseOrder';
+import CreateCust from '../components/CustomerPages/Retailer/CreateCust';
 const Routes = () => {
     const Stack= createNativeStackNavigator()
   return (
@@ -435,6 +436,8 @@ const Routes = () => {
 <Stack.Screen name="CollectionCreateOverview" component={CollectionCreateOverview} />
 
 <Stack.Screen name="Retailer" component={Retailer} />
+<Stack.Screen name="CreateCustomer" component={CreateCust} />
+<Stack.Screen name="B2CCustomer" component={B2CCustomer} />
 <Stack.Screen name="RetailerOverview" component={RetailerOverview} />
 <Stack.Screen name="DeliveryProcess" component={DeliveryProcess} />
 

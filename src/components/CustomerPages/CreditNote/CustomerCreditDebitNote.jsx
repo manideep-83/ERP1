@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AppTable from '../../../ReusableComponents/AppTable';
 import { useNavigation } from '@react-navigation/native';
 import AppButton from '../../../ReusableComponents/AppButton';
+import ERPContext from '../../../Context/ERPContext';
 
 const CustomerCreditDebitNote = () => {
+    const { FetchB2B, b2b, loading } = useContext(ERPContext);
+    useEffect(() => {
+        FetchB2B();
+      }, []);
     const [quickSearchInput, setQuickSearchInput] = useState('');
     const [selectedDate, setSelectedDate] = useState('Select Date');
-    const [tableData, setTableData] = useState([
-        { id: '1', branchCode: '16622', refNo: 'REF-001', supplier: 'Supplier A', amount: '100.00' },
-        { id: '2', branchCode: '16623', refNo: 'REF-002', supplier: 'Supplier B', amount: '250.00' },
-        { id: '3', branchCode: '16624', refNo: 'REF-003', supplier: 'Supplier C', amount: '50.00' },
-    ]);
+   
 
     const navigation = useNavigation();
 
@@ -44,10 +45,10 @@ const CustomerCreditDebitNote = () => {
     };
 
     const columns = [
-        { header: 'Branch Code', key: 'branchCode', flex: 2 },
+        { header: 'Branch Code', key: 'contact_id', flex: 2 },
         { header: 'Reference No.', key: 'refNo', flex: 3 },
         { header: 'Date', key: 'date', flex: 4 },
-        { header: 'Customer Code', key: 'amount', flex: 2 },
+        { header: 'Customer Code', key: 'contact_name', flex: 2 },
         {
             header: 'Action',
             key: 'action',
@@ -111,8 +112,8 @@ const CustomerCreditDebitNote = () => {
                     <Text style={styles.resultsTitle}>Search Results</Text>
                     <AppTable
                         columns={columns}
-                        data={tableData}
-                        message={tableData.length === 0 ? 'No matching record(s) found' : `${tableData.length} matching record(s) found`}
+                        data={b2b}
+                        message={loading ? 'Loading...' : `Total Records: ${b2b.length}`}
                     />
                 </View>
             </ScrollView>

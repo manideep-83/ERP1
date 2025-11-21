@@ -1,264 +1,504 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Platform } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { Picker } from '@react-native-picker/picker'; // Re-adding Picker for dropdowns
+import React, { useState, useEffect, useContext } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    ScrollView,
+} from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import ERPContext from '../../../Context/ERPContext';
 
 const CreateOrderBooking = () => {
-    // --- State for Order Creation Form Fields ---
-    const [distributorBranchCode, setDistributorBranchCode] = useState('16622-16622-SRI VENKATE');
+
+    // CONTEXT
+    const {
+        FetchB2B,
+        b2b,
+        Item,
+        FetchItem,
+        CreateSO
+    } = useContext(ERPContext);
+
+    // STATES
+    const [distributorBranchCode] = useState('16622-16622-SRI VENKATE');
     const [orderNo, setOrderNo] = useState('');
-    const [status, setStatus] = useState('New');
-    const [mtOrderRef, setMtOrderRef] = useState('');
-    const [poReferenceNo, setPoReferenceNo] = useState('');
-    const [orderType, setOrderType] = useState('Normal');
+    const [status] = useState('New');
+
     const [salesman, setSalesman] = useState('Select Salesman');
     const [route, setRoute] = useState('Select Route');
-    const [customerSearch, setCustomerSearch] = useState('');
-    const [customerCode, setCustomerCode] = useState('');
-    const [shippingAddress, setShippingAddress] = useState('Select');
+
+    // CUSTOMER STATES
     const [customerInput, setCustomerInput] = useState('');
-    const [orderDate, setOrderDate] = useState('08/09/2025');
+    const [normalizedCustomers, setNormalizedCustomers] = useState([]);
+    const [filteredCustomers, setFilteredCustomers] = useState([]);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
 
-    // Mock Data for Pickers
-    const salesmanOptions = ["Select Salesman", "SM01 - JOHN DOE", "SM02 - JANE SMITH"];
+    // ITEM STATES
+    const [itemSearch, setItemSearch] = useState('');
+    const [filteredItems, setFilteredItems] = useState([]);
+    const [showItemDropdown, setShowItemDropdown] = useState(false);
+
+    // CART
+    const [cart, setCart] = useState([]);
+
+    const salesmanOptions = ["Select Salesman", "SM01 - JOHN", "SM02 - RAVI"];
     const routeOptions = ["Select Route", "RT-A", "RT-B", "RT-C"];
-    const shippingOptions = ["Select", "Address 1", "Address 2"];
 
-    const handleSave = () => console.log('Saving new order...');
-    const handleDiscard = () => console.log('Discarding order...');
-    const handleDiscount = () => console.log('Applying Discount...');
+    // FETCH DATA
+    useEffect(() => {
+        FetchB2B();
+        FetchItem();
+    }, []);
 
-    const renderPicker = (selectedValue, onValueChange, options) => (
-        <View style={styles.pickerContainer}>
-            <Picker
-                selectedValue={selectedValue}
-                onValueChange={onValueChange}
-                style={styles.picker}
-            >
-                {options.map((option, index) => (
-                    <Picker.Item key={index} label={option} value={option} />
-                ))}
-            </Picker>
-        </View>
+    // NORMALIZE CUSTOMERS
+    useEffect(() => {
+        if (b2b.length > 0) {
+            const normalized = b2b.map(c => ({
+                customer_id: c.contact_id,
+                customer_name: c.contact_name,
+                company_name: c.company_name,
+                email: c.email,
+                phone: c.phone,
+                billing_address: c.billing_address,
+                shipping_address: c.shipping_address,
+                custom_fields: c.custom_fields,
+                ...c
+            }));
+
+            setNormalizedCustomers(normalized);
+            setFilteredCustomers(normalized);
+        }
+    }, [b2b]);
+
+    // CUSTOMER SEARCH
+    useEffect(() => {
+        if (customerInput.trim() === "") {
+            setFilteredCustomers(normalizedCustomers);
+            return;
+        }
+
+        const searched = normalizedCustomers.filter(c =>
+            c.customer_name.toLowerCase().includes(customerInput.toLowerCase())
+        );
+
+        setFilteredCustomers(searched);
+    }, [customerInput, normalizedCustomers]);
+
+    // ITEM SEARCH
+    useEffect(() => {
+        if (itemSearch.trim() === "") {
+            setFilteredItems(Item);
+            return;
+        }
+
+        const searched = Item.filter(i =>
+            (i.name || "").toLowerCase().includes(itemSearch.toLowerCase())
+        );
+
+        setFilteredItems(searched);
+    }, [itemSearch, Item]);
+
+    // ADD ITEM WITH C-RATE PRICE
+    const addItem = (item) => {
+        setCart(prev => {
+            const exists = prev.find(i => i.item_id === item.item_id);
+            if (exists) return prev;
+
+            return [
+                ...prev,
+                {
+                    ...item,
+                    quantity: 1,
+                    applied_rate: item.cf_c_rate_price_unformatted || 0
+                }
+            ];
+        });
+    };
+
+    // UPDATE QTY
+    const updateQty = (index, qty) => {
+        const updated = [...cart];
+        updated[index].quantity = Math.max(1, qty);
+        setCart(updated);
+    };
+
+    // REMOVE ITEM
+    const removeItem = (index) => {
+        const updated = cart.filter((_, i) => i !== index);
+        setCart(updated);
+    };
+
+    // SAVE SALES ORDER
+    const handleSave = async () => {
+        if (!selectedCustomer) return alert("Select a customer");
+        if (cart.length === 0) return alert("Add at least one item");
+
+        const payload = {
+            customer_id: selectedCustomer.customer_id,
+            customer_name: selectedCustomer.customer_name,
+
+            date: new Date().toISOString().split("T")[0],
+            reference_number: orderNo || `SO-${Date.now()}`,
+
+            salesman: salesman !== "Select Salesman" ? salesman : "",
+            route: route !== "Select Route" ? route : "",
+
+            line_items: cart.map(item => ({
+                item_id: item.item_id,
+                quantity: item.quantity,
+                rate: item.applied_rate,
+                total: item.quantity * item.applied_rate,
+            })),
+
+            
+
+           
+        };
+
+        console.log("FINAL SO PAYLOAD:", JSON.stringify(payload, null, 2));
+
+        await CreateSO(JSON.stringify(payload));
+    };
+
+    // PICKER
+    const renderPicker = (value, setValue, options) => (
+        <Picker selectedValue={value} onValueChange={setValue} style={styles.picker}>
+            {options.map((op, i) => <Picker.Item key={i} label={op} value={op} />)}
+        </Picker>
     );
 
+    // UI
     return (
         <ScrollView style={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerText}>Create New</Text>
-            </View>
 
-            {/* --- Main Order Form Container --- */}
+            <Text style={styles.headerText}>Create New Order</Text>
+
+            {/* FORM CARD */}
             <View style={styles.formContainer}>
-                
-                {/* Row 1: Distributor Branch Code | Order No | Status */}
+
+                {/* ROW 1 */}
                 <View style={styles.row}>
-                    <View style={[styles.inputGroup, styles.inputGroupMarginRight]}>
+                    <View style={[styles.inputGroup, styles.mr]}>
                         <Text style={styles.label}>Distributor Branch Code</Text>
                         <Text style={styles.displayValue}>{distributorBranchCode}</Text>
                     </View>
-                    <View style={[styles.inputGroup, styles.inputGroupMarginRight]}>
+
+                    <View style={[styles.inputGroup, styles.mr]}>
                         <Text style={styles.label}>Order No</Text>
                         <TextInput style={styles.input} value={orderNo} onChangeText={setOrderNo} />
                     </View>
+
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Status</Text>
                         <Text style={styles.displayValue}>{status}</Text>
                     </View>
                 </View>
 
-                {/* Row 2: MT Order Ref | PO Reference No | Order Type */}
+                {/* ROW 2 */}
                 <View style={styles.row}>
-                    <View style={[styles.inputGroup, styles.inputGroupMarginRight]}>
-                        <Text style={styles.label}>MT Order Ref</Text>
-                        <TextInput style={styles.input} value={mtOrderRef} onChangeText={setMtOrderRef} />
-                    </View>
-                    <View style={[styles.inputGroup, styles.inputGroupMarginRight]}>
-                        <Text style={styles.label}>PO Reference No</Text>
-                        <TextInput style={styles.input} value={poReferenceNo} onChangeText={setPoReferenceNo} />
-                    </View>
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Order Type</Text>
-                        <Text style={styles.displayValue}>{orderType}</Text>
-                    </View>
-                </View>
-                
-                {/* Row 3: Salesman | Route | Customer Search */}
-                <View style={styles.row}>
-                    <View style={[styles.inputGroup, styles.inputGroupMarginRight]}>
+                    <View style={[styles.inputGroup, styles.mr]}>
                         <Text style={styles.label}>Salesman</Text>
                         {renderPicker(salesman, setSalesman, salesmanOptions)}
                     </View>
-                    <View style={[styles.inputGroup, styles.inputGroupMarginRight]}>
+
+                    <View style={[styles.inputGroup, styles.mr]}>
                         <Text style={styles.label}>Route</Text>
                         {renderPicker(route, setRoute, routeOptions)}
                     </View>
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Customer Search</Text>
-                        <TextInput style={styles.input} value={customerCode} onChangeText={setCustomerCode} placeholder="Customer Code" />
-                    </View>
                 </View>
 
-                {/* Row 4: Shipping Address | Customer Input Text | Order Date */}
-                <View style={styles.row}>
-                    <View style={[styles.inputGroup, styles.inputGroupMarginRight]}>
-                        <Text style={styles.label}>Shipping Address</Text>
-                        {renderPicker(shippingAddress, setShippingAddress, shippingOptions)}
+                {/* CUSTOMER DROPDOWN */}
+                <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Customer (B2B)</Text>
+
+                    <TouchableOpacity
+                        style={styles.selectorBox}
+                        onPress={() => {
+                            setShowCustomerDropdown(!showCustomerDropdown);
+                            setShowItemDropdown(false);
+                            setCustomerInput("");
+                            setFilteredCustomers(normalizedCustomers);
+                        }}
+                    >
+                        <Text style={styles.selectorText}>
+                            {selectedCustomer ? selectedCustomer.customer_name : "Select Customer"}
+                        </Text>
+                    </TouchableOpacity>
+
+                    {showCustomerDropdown && (
+                        <View style={styles.dropdownPanel}>
+                            <TextInput
+                                placeholder="Search Customer"
+                                style={styles.dropdownSearch}
+                                value={customerInput}
+                                onChangeText={setCustomerInput}
+                            />
+
+                            <ScrollView style={{ maxHeight: 230 }}>
+                                {filteredCustomers.map(cust => (
+                                    <TouchableOpacity
+                                        key={cust.customer_id}
+                                        style={styles.dropdownItemRow}
+                                        onPress={() => {
+                                            setSelectedCustomer(cust);
+                                            setShowCustomerDropdown(false);
+                                        }}
+                                    >
+                                        <Text style={styles.dropdownItemTitle}>{cust.customer_name}</Text>
+                                        <Text style={styles.dropdownItemSub}>{cust.customer_id}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        </View>
+                    )}
+                </View>
+            </View>
+
+            {/* CUSTOMER CARD */}
+            {selectedCustomer && (
+                <View style={styles.customerCard}>
+                    <Text style={styles.customerTitle}>Customer Details</Text>
+
+                    <View style={styles.customerRow}>
+                        <Text style={styles.customerLabel}>Name:</Text>
+                        <Text style={styles.customerValue}>{selectedCustomer.customer_name}</Text>
                     </View>
-                    <View style={[styles.inputGroup, styles.inputGroupMarginRight]}>
-                        <Text style={styles.label}>Input Text - customer</Text>
-                        <TextInput 
-                            style={styles.input} 
-                            value={customerInput} 
-                            onChangeText={setCustomerInput} 
-                            placeholder="Enter atleast 3 charecters"
+
+                    <View style={styles.customerRow}>
+                        <Text style={styles.customerLabel}>Code:</Text>
+                        <Text style={styles.customerValue}>{selectedCustomer.customer_id}</Text>
+                    </View>
+
+                    <View style={styles.customerRow}>
+                        <Text style={styles.customerLabel}>Company:</Text>
+                        <Text style={styles.customerValue}>{selectedCustomer.company_name}</Text>
+                    </View>
+                </View>
+            )}
+
+            {/* ITEM DROPDOWN */}
+            <View style={styles.formContainer}>
+                <Text style={styles.label}>Items</Text>
+
+                <TouchableOpacity
+                    style={styles.selectorBox}
+                    onPress={() => {
+                        setShowItemDropdown(!showItemDropdown);
+                        setShowCustomerDropdown(false);
+                        setItemSearch("");
+                        setFilteredItems(Item);
+                    }}
+                >
+                    <Text style={styles.selectorText}>Select Items</Text>
+                </TouchableOpacity>
+
+                {showItemDropdown && (
+                    <View style={styles.dropdownPanel}>
+                        <TextInput
+                            placeholder="Search Items"
+                            style={styles.dropdownSearch}
+                            value={itemSearch}
+                            onChangeText={setItemSearch}
                         />
-                    </View>
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Order Date</Text>
-                        <Text style={styles.displayValue}>{orderDate}</Text>
-                    </View>
-                </View>
 
+                        <ScrollView style={{ maxHeight: 260 }}>
+                            {filteredItems.map(item => (
+                                <TouchableOpacity
+                                    key={item.item_id}
+                                    style={styles.dropdownItemRow}
+                                    onPress={() => addItem(item)}
+                                >
+                                    <Text style={styles.dropdownItemTitle}>{item.name}</Text>
+                                    <Text style={styles.dropdownItemSub}>
+                                        ₹{item.cf_c_rate_price_unformatted || 0}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
+                    </View>
+                )}
             </View>
 
-            {/* Placeholder for the main product listing/order items table */}
-            <View style={styles.searchResultsPlaceholder}>
-                <Text style={styles.placeholderText}>Order Items/Product Listing Table goes here.</Text>
+            {/* CART */}
+            <View style={styles.cartContainer}>
+                <Text style={styles.cartTitle}>Order Items</Text>
+
+                {cart.length === 0 && (
+                    <Text style={{ textAlign: 'center', color: '#aaa' }}>No items added</Text>
+                )}
+
+                {cart.map((item, index) => (
+                    <View
+                        key={item.item_id}
+                        style={styles.cartRow}
+                    >
+                        <Text style={styles.cartItem}>{item.name}</Text>
+
+                        <View style={styles.qtyRow}>
+                            <TouchableOpacity onPress={() => updateQty(index, item.quantity - 1)}>
+                                <Text style={styles.qtyBtn}>-</Text>
+                            </TouchableOpacity>
+
+                            <Text style={styles.qty}>{item.quantity}</Text>
+
+                            <TouchableOpacity onPress={() => updateQty(index, item.quantity + 1)}>
+                                <Text style={styles.qtyBtn}>+</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        <Text style={styles.cartPrice}>₹{item.applied_rate}</Text>
+
+                        <TouchableOpacity onPress={() => removeItem(index)} style={styles.deleteBtn}>
+                            <Text style={styles.deleteText}>🗑</Text>
+                        </TouchableOpacity>
+                    </View>
+                ))}
             </View>
 
-            {/* --- Action Buttons --- */}
+            {/* BUTTONS */}
             <View style={styles.buttonRow}>
-                <TouchableOpacity style={[styles.actionButton, styles.saveButton]} onPress={handleSave}>
-                    <Text style={styles.buttonText}>Save</Text>
+                <TouchableOpacity style={[styles.btn, styles.save]} onPress={handleSave}>
+                    <Text style={styles.btnText}>Save</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.actionButton, styles.discardButton]} onPress={handleDiscard}>
-                    <Text style={styles.buttonText}>Discard</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.actionButton, styles.discountButton]} onPress={handleDiscount}>
-                    <Text style={styles.buttonText}>% Discount</Text>
+
+                <TouchableOpacity style={[styles.btn, styles.discard]}>
+                    <Text style={styles.btnText}>Discard</Text>
                 </TouchableOpacity>
             </View>
+
         </ScrollView>
     );
 };
 
+// STYLES
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f5f5f5',
-        padding: 10,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        paddingVertical: 15,
-        marginBottom: 20,
-    },
+    container: { padding: 10, backgroundColor: '#f5f5f5' },
+
     headerText: {
         fontSize: 30,
         fontWeight: 'bold',
         color: '#1f3a8a',
-        marginLeft: 10,
+        marginBottom: 20,
+        alignSelf: 'center'
     },
-    // --- Form Container ---
+
     formContainer: {
         backgroundColor: '#fff',
-        padding: 20,
+        padding: 15,
         borderRadius: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 3,
-        marginBottom: 20,
-    },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
         marginBottom: 15,
+        elevation: 2,
     },
-    inputGroup: {
-        flex: 1, // Ensures 3 columns of equal width
-    },
-    inputGroupMarginRight: {
-        marginRight: 10,
-    },
-    label: {
-        fontSize: 12,
-        color: '#666',
-        marginBottom: 2,
-    },
+
+    row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 },
+    inputGroup: { flex: 1 },
+    mr: { marginRight: 10 },
+
+    label: { fontSize: 13, color: '#555', marginBottom: 6 },
     input: {
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
-        paddingVertical: Platform.OS === 'ios' ? 8 : 4,
-        fontSize: 16,
+        paddingVertical: 6,
+        fontSize: 16
     },
+
     displayValue: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#333',
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
-        paddingVertical: Platform.OS === 'ios' ? 8 : 4,
+        paddingVertical: 6,
     },
-    
-    // --- Action Buttons ---
-    buttonRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        paddingHorizontal: 5,
-        marginBottom: 20,
-        marginTop: 10,
-    },
-    actionButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 20,
+
+    picker: { height: 45, width: '100%' },
+
+    selectorBox: {
+        borderWidth: 1,
+        borderColor: '#ccc',
         borderRadius: 8,
-        marginHorizontal: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
+        paddingVertical: 12,
+        paddingHorizontal: 12,
+        backgroundColor: '#fafafa',
+    },
+    selectorText: { fontSize: 16, color: '#333' },
+
+    dropdownPanel: {
+        backgroundColor: "#fff",
+        borderWidth: 1,
+        borderColor: "#ccc",
+        borderRadius: 10,
+        padding: 12,
+        marginTop: 8,
         elevation: 3,
     },
-    saveButton: {
-        backgroundColor: '#1f3a8a',
-    },
-    discardButton: {
-        backgroundColor: '#dc2626',
-    },
-    discountButton: {
-        backgroundColor: '#5cb85c', // A distinct color for the discount button
-    },
-    buttonIcon: {
-        marginRight: 8,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    // --- Placeholder Styles ---
-    searchResultsPlaceholder: {
-        marginTop: 5,
-        padding: 50,
+
+    dropdownSearch: {
         borderWidth: 1,
-        borderColor: '#eee',
-        borderStyle: 'dashed',
-        borderRadius: 5,
-        alignItems: 'center',
+        borderColor: "#ccc",
+        borderRadius: 8,
+        padding: 10,
+        marginBottom: 12,
+        fontSize: 16
+    },
+
+    dropdownItemRow: {
+        paddingVertical: 10,
+        paddingHorizontal: 6,
+        borderBottomWidth: 1,
+        borderBottomColor: "#eee"
+    },
+    dropdownItemTitle: { fontSize: 16, fontWeight: "600", color: "#333" },
+    dropdownItemSub: { fontSize: 12, color: "#888" },
+
+    customerCard: {
+        backgroundColor: "#fff",
+        padding: 18,
+        borderRadius: 12,
+        marginBottom: 15,
+        elevation: 3,
+    },
+    customerTitle: { fontSize: 18, fontWeight: '700', marginBottom: 12, color: "#1f3a8a" },
+    customerRow: { flexDirection: 'row', marginBottom: 8 },
+    customerLabel: { width: '40%', fontSize: 14, fontWeight: '600', color: "#555" },
+    customerValue: { width: '60%', fontSize: 15, fontWeight: 'bold', color: "#222" },
+
+    cartContainer: {
         backgroundColor: '#fff',
+        padding: 15,
+        borderRadius: 12,
+        marginBottom: 20,
+        elevation: 3,
     },
-    placeholderText: {
-        color: '#ccc',
-        fontStyle: 'italic',
+    cartTitle: { fontSize: 20, fontWeight: '700', marginBottom: 15, color: "#1f3a8a" },
+
+    cartRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: "#eee"
     },
+
+    cartItem: { width: '40%', fontSize: 15, fontWeight: '500' },
+
+    qtyRow: { flexDirection: 'row', alignItems: 'center' },
+    qtyBtn: { fontSize: 22, paddingHorizontal: 12, color: "#1f3a8a" },
+    qty: { fontSize: 18, paddingHorizontal: 10 },
+
+    cartPrice: { width: '18%', textAlign: 'right', fontSize: 16, fontWeight: '700' },
+
+    deleteBtn: { paddingHorizontal: 6 },
+    deleteText: { fontSize: 22, color: 'red' },
+
+    buttonRow: { flexDirection: 'row', justifyContent: 'center', marginVertical: 20 },
+    btn: { paddingVertical: 14, paddingHorizontal: 25, borderRadius: 10, marginHorizontal: 10 },
+    save: { backgroundColor: '#1f3a8a' },
+    discard: { backgroundColor: '#dc2626' },
+    btnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
 });
 
 export default CreateOrderBooking;

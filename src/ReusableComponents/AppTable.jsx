@@ -1,6 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
+const getValueByPath = (item, key) => {
+  if (!item || !key) return '';
+  return key.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), item) ?? '';
+};
+
 const AppTable = ({ columns = [], data = [], message = "No records found" }) => {
 
   const renderTableHeaders = () => (
@@ -36,7 +41,7 @@ const AppTable = ({ columns = [], data = [], message = "No records found" }) => 
               ? column.renderCell(item ?? {})
               : (
                 <Text style={styles.tableRowText}>
-                  {item?.[column?.key] ?? ''}
+                  {getValueByPath(item, column?.key)}
                 </Text>
               )}
           </View>

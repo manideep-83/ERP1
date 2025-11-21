@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '../../../ReusableComponents/SearchBar';
 import AppTable from '../../../ReusableComponents/AppTable';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import ERPContext from '../../../Context/ERPContext';
 import AppButton from '../../../ReusableComponents/AppButton';
 
 const Retailer = () => {
+  const { FetchB2B, b2b, loading } = useContext(ERPContext);
+    useEffect(() => {
+        FetchB2B();
+      }, []);
   const navigation = useNavigation();
 
   const handleDateSelect = (date) => {
@@ -23,9 +27,11 @@ const Retailer = () => {
   };
 
   const columns = [
-    { header: 'Distributor Branch', key: 'id', flex: 1 },
-    { header: 'Type', key: 'name', flex: 2 },
-    { header: 'Distr Retailer Code', key: 'date', flex: 2 },
+    { header: 'Outlet Name', key: 'company_name', flex: 2 },
+    { header: 'Owner Name', key: 'contact_name', flex: 2 },
+    { header: 'Outlet Category', key: 'custom_fields.outlet_category', flex: 2 },
+    { header: 'Outstanding', key: 'custom_fields.available_credit', flex: 2 },
+    { header: 'outlet id', key: 'custom_fields.outlet_id', flex: 2 },
     {
       header: 'Action',
       key: 'action',
@@ -33,32 +39,28 @@ const Retailer = () => {
       renderCell: (item) => (
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity onPress={() => handleView(item)} style={{ marginRight: 12 }}>
-            <Ionicons name="eye-outline" size={20} color="#2563eb" />
+            <Text>👁️</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleDelete(item)}>
-            <Ionicons name="trash-outline" size={20} color="#dc2626" />
+          <Text>🗑️</Text>
           </TouchableOpacity>
         </View>
       )
     }
   ];
 
-  const data = [
-    { id: 1, name: 'Product A', date: '12-08-2023' },
-    { id: 2, name: 'Product B', date: '12-09-2023' },
-  ];
 
   return (
     <View style={styles.container}>
       {/* Header with Create Button */}
       <View style={styles.headerRow}>
-        <Text style={styles.title}>Retailer</Text>
-        {/* <AppButton
-          label="Create New"
-          onPress={() => navigation.navigate('CreateRetailer')} 
-          style={styles.createNewButton}
-          textStyle={styles.createNewButtonText}
-        /> */}
+        <Text style={styles.title}>B2B Customers</Text>
+        <AppButton 
+            label="Create New"
+            onPress={() => navigation.navigate("CreateCustomer")}
+            style={styles.createButton}
+            textStyle={styles.createButtonText}
+          />
       </View>
 
       {/* Search Bar */}
@@ -73,8 +75,8 @@ const Retailer = () => {
       {/* Data Table */}
       <AppTable
         columns={columns}
-        data={data}
-        message={`Total Records: ${data.length}`}
+        data={b2b}
+        message={loading ? 'Loading...' : `Total Records: ${b2b.length}`}
       />
     </View>
   );
@@ -117,6 +119,17 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   createNewButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  createButton: {
+    backgroundColor: "#1f3a8a",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 6
+  },
+  createButtonText: {
     color: '#fff',
     fontSize: 15,
     fontWeight: '600',

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,30 +10,36 @@ import {
 import { RadioButton } from "react-native-paper";
 import AppTable from '../../ReusableComponents/AppTable'
 import { useNavigation } from "@react-navigation/native";
+import ERPContext from "../../Context/ERPContext";
 const EInvoiceReport = () => {
+  const { EInvoiceDB, EInvoicee, loading } = useContext(ERPContext);
+
+    useEffect(() => {
+      EInvoiceDB();
+      }, []);
   const navigation=useNavigation()
    const change=(name)=>{
       // console.error("pressed",id);
        return navigation.navigate(name);
     }
-   const columns = [
-  { header: 'Invoice No', key: 'id', flex: 1 },
-  { header: 'IRN Status', key: 'name', flex: 2 },
-  { header: 'Invoice Tpe Tax', key: 'date', flex: 2 },
-  { header: 'Amount', key: 'date', flex: 2 },
-
-  { 
-    header: 'Action', 
-    key: 'action', 
-    flex: 1,
-    renderCell: (item) => (
-      <TouchableOpacity onPress={() =>{change("EInvoiceOverview")}}>
-        <Text>Show</Text>
-      </TouchableOpacity>
-      
-    )
-  }
-];
+    const columns = [
+      { header: 'Invoice No', key: 'invoice_number', flex: 2 },
+      { header: 'IRN Status', key: 'status', flex: 2 },
+      { header: 'Invoice Type', key: 'invoice_type', flex: 2 },
+      { header: 'Amount', key: 'amount', flex: 2 },
+    
+      { 
+        header: 'Action', 
+        key: 'action', 
+        flex: 1,
+        renderCell: (item) => (
+          <TouchableOpacity onPress={() => navigation.navigate("EInvoiceOverview", { invoice: item })}>
+            <Text style={{ color: "blue" }}>Show</Text>
+          </TouchableOpacity>
+        )
+      }
+    ];
+    
 
 const data = [
   { id: 1, name: 'Product A' ,date:'12-08-2023'},
@@ -134,8 +140,8 @@ const data = [
       {/* Table */}
        <AppTable 
         columns={columns} 
-        data={data} 
-        message={`Total Records: ${data.length}`}
+        data={EInvoicee} 
+        message={loading ? 'Loading...' : `Total Records: ${EInvoicee.length}`}
       />
 
       {/* Generate Button */}

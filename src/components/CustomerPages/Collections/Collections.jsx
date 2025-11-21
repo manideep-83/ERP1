@@ -1,134 +1,184 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, SafeAreaView, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import SearchBar from '../../../ReusableComponents/SearchBar'
+import SearchBar from '../../../ReusableComponents/SearchBar';
 import AppTable from '../../../ReusableComponents/AppTable';
 import AppButton from '../../../ReusableComponents/AppButton';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import ERPContext from '../../../Context/ERPContext';
 
 const Collections = () => {
   const navigation = useNavigation();
-  const handleDateSelect = (date) => {
-    console.log('Selected date:', date);
+
+  const { FetchCollection, collection, loading } = useContext(ERPContext);
+
+  const [activeFilter, setActiveFilter] = useState("all");
+
+  useEffect(() => {
+    FetchCollection("all");  // default load
+  }, []);
+
+  // When filter button clicked
+  const applyFilter = (status) => {
+    setActiveFilter(status);
+    FetchCollection(status);
   };
-  const handleView = (item) => navigation.navigate('CollectionsOverview');
+
+  const handleView = (item) => {
+    navigation.navigate('CollectionsOverview', { item });
+  };
+
   const handleDelete = (item) => {
-    Alert.alert('Delete', `Are you sure you want to delete ${item.name}?`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => console.log('Deleted', item) }
-    ]);
+    Alert.alert(
+      'Delete',
+      `Are you sure you want to delete ${item.invoice_number}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Delete', style: 'destructive', onPress: () => console.log('Deleted', item) }
+      ]
+    );
   };
 
   const columns = [
-    { header: 'Claim Code', key: 'id', flex: 1 },
-    { header: 'Claim Description', key: 'name', flex: 2 },
-    { header: 'Claim Date', key: 'date', flex: 2 },
+    { header: 'Customer Name', key: 'customer_name', flex: 2 },
+    { header: 'Invoice No', key: 'invoice_number', flex: 2 },
+    { header: 'Due Amount', key: 'due_amount', flex: 1 },
+    { header: 'Status', key: 'status', flex: 2 },
     {
       header: 'Action',
       key: 'action',
       flex: 2,
       renderCell: (item) => (
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity onPress={() => handleView(item)} style={{ marginRight: 10 }}>
-            <Ionicons name="eye-outline" size={20} color="#007bff" />
+          <TouchableOpacity onPress={() => handleView(item)} style={{ marginRight: 12 }}>
+            <Text>👁️</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleDelete(item)}>
-            <Ionicons name="trash-outline" size={20} color="#dc2626" />
+            <Text>🗑️</Text>
           </TouchableOpacity>
         </View>
       )
     }
   ];
 
-  const data = [
-    { id: 1, name: 'Claim A', date: '12-08-2023' },
-    { id: 2, name: 'Claim B', date: '12-09-2023' },
-  ];
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header Row */}
+
+        {/* Header */}
         <View style={styles.headerRow}>
           <Text style={styles.title}>Collections</Text>
-          <AppButton
+          <AppButton 
             label="Create New"
-            onPress={() => navigation.navigate('CreateCollections')}
-            style={styles.createNewButton}
-            textStyle={styles.createNewButtonText}
+            onPress={() => navigation.navigate("CreateCollections")}
+            style={styles.createButton}
+            textStyle={styles.createButtonText}
           />
         </View>
 
-        <SearchBar
-          placeholder="Search Claim"
-          showDatePicker={true}
-          onDateChange={handleDateSelect}
+        {/* Search */}
+        <SearchBar 
+          placeholder="Search By Customer Name"
+          showDatePicker={false}
         />
 
+        {/* FILTER BUTTONS */}
+        <View style={styles.filterRow}>
+          {["all", "overdue", "due_today", "due_soon", "pending"].map((filter) => (
+            <TouchableOpacity
+              key={filter}
+              onPress={() => applyFilter(filter)}
+              style={[
+                styles.filterButton,
+                activeFilter === filter && styles.filterButtonActive
+              ]}
+            >
+              <Text style={[
+                styles.filterText,
+                activeFilter === filter && styles.filterTextActive
+              ]}>
+                {filter.replace("_", " ").toUpperCase()}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* RESULTS */}
         <View style={styles.resultsContainer}>
           <Text style={styles.resultsTitle}>Search Results</Text>
+
           <AppTable
             columns={columns}
-            data={data}
-            message={`Total Records: ${data.length}`}
+            data={collection}
+            message={loading ? "Loading..." : `Total Records: ${collection.length}`}
           />
         </View>
+
       </ScrollView>
     </SafeAreaView>
   );
 };
 
+export default Collections;
+
+// ------------------- STYLES --------------------
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  scrollContent: {
-    flexGrow: 1,
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 10,
-  },
+  safeArea: { flex: 1, backgroundColor: "#fff" },
+  scrollContent: { flexGrow: 1, paddingHorizontal: 10 },
+
   headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 15,
-    marginBottom: 20,
   },
-  title: { 
-    fontSize: 20, 
-    fontWeight: 'bold', 
-    color: '#1f3a8a',
-    marginLeft: 10,
-  },
-  createNewButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1f3a8a',
+
+  title: { fontSize: 20, fontWeight: "bold", color: "#1f3a8a" },
+
+  createButton: {
+    backgroundColor: "#1f3a8a",
     paddingVertical: 10,
     paddingHorizontal: 15,
+    borderRadius: 6
+  },
+
+  createButtonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+
+  filterRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginVertical: 10,
+  },
+
+  filterButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#1f3a8a",
     borderRadius: 5,
     marginRight: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  createNewButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  resultsContainer: {
-    marginBottom: 20,
-  },
-  resultsTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
     marginBottom: 10,
   },
-});
 
-export default Collections;
+  filterButtonActive: {
+    backgroundColor: "#1f3a8a",
+  },
+
+  filterText: {
+    color: "#1f3a8a",
+    fontWeight: "bold",
+  },
+
+  filterTextActive: {
+    color: "#fff",
+  },
+
+  resultsContainer: {
+    marginTop: 10,
+  },
+
+  resultsTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  }
+});
